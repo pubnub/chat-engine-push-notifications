@@ -1,0 +1,32 @@
+{
+  "rootDir": "../../",
+  "collectCoverage": true,
+  "coverageDirectory": "./coverage",
+  "coverageReporters": [
+    "json",
+    "text",
+    "lcov",
+    "clover"
+  ],
+  "coverageThreshold": {
+    "global": {
+      "branches": 90,
+      "functions": 90,
+      "lines": 90,
+      "statements": 90
+    }
+  },
+  "modulePathIgnorePatterns": [
+    "<rootDir>/demo",
+    "<rootDir>/node_modules/react-native/Libraries/react-native/"
+  ],
+  "testPathIgnorePatterns": [
+    "<rootDir>/.idea",
+    "<rootDir>/Libraries",
+    "<rootDir>/coverage",
+    "<rootDir>/docs",
+    "/node_modules/"
+  ],
+  "notify": true,
+  "preset": "react-native"
+}
