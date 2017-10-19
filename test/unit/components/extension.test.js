@@ -374,13 +374,13 @@ describe('unittest::CENotificationsExtension', () => {
             expect(typeof extension.setPushNotificationState === 'function').toBeTruthy();
         });
 
-        test('should not chane push notifications state if device notification token not available', () => {
+        test('should not change push notifications state if device notification token not available', () => {
             delete extension.notificationToken;
             extension.setPushNotificationState(chat, 'enable');
             expect(extension.ChatEngine.pubnub.push.addChannels).not.toHaveBeenCalled();
         });
 
-        test('should not chane push notifications state to intermediate state (not to enable or disable)', () => {
+        test('should not change push notifications state to intermediate state (not to enable or disable)', () => {
             extension.setPushNotificationState(chat, 'enabling');
             expect(extension.ChatEngine.pubnub.push.addChannels).not.toHaveBeenCalled();
         });
@@ -426,6 +426,31 @@ describe('unittest::CENotificationsExtension', () => {
             expect(extension.chatsState.chat1.states).toHaveLength(1);
             expect(extension.chatsState.chat1.states[0]).toEqual('enabling');
             expect(extension.ChatEngine.pubnub.push.addChannels).toHaveBeenCalled();
+        });
+
+        test('should change \'created\' to \'erredDisable\' in attempt to enable if notification token is not set', () => {
+            extension.notificationToken = undefined;
+            const onPushNotificationStateChangeCompletionSpy = jest.spyOn(extension, 'onPushNotificationStateChangeCompletion');
+            extension.setPushNotificationState(chat, 'enable');
+            expect(extension.chatsState.chat1.states).toHaveLength(1);
+            expect(extension.chatsState.chat1.states[0]).toEqual('erredEnable');
+            expect(onPushNotificationStateChangeCompletionSpy).toHaveBeenCalledWith(chat, true, { error: {} });
+        });
+
+        test('should change \'created\' to \'erredDisable\' in attempt to disable if notification token is not set', () => {
+            extension.notificationToken = undefined;
+            const onPushNotificationStateChangeCompletionSpy = jest.spyOn(extension, 'onPushNotificationStateChangeCompletion');
+            extension.setPushNotificationState(chat, 'disable');
+            expect(extension.chatsState.chat1.states).toHaveLength(1);
+            expect(extension.chatsState.chat1.states[0]).toEqual('erredDisable');
+            expect(onPushNotificationStateChangeCompletionSpy).toHaveBeenCalledWith(chat, false, { error: {} });
+        });
+
+        test('should start delayed notification state change if notification token is not set', () => {
+            extension.notificationToken = undefined;
+            const startDelayedNotificationStateChangeSpy = jest.spyOn(extension, 'startDelayedNotificationStateChange');
+            extension.setPushNotificationState(chat, 'disable');
+            expect(startDelayedNotificationStateChangeSpy).toHaveBeenCalled();
         });
 
         test('should change push notifications state for created chat in iOS environment', () => {
@@ -661,21 +686,21 @@ describe('unittest::CENotificationsExtension', () => {
         test('should be called in response on \'$.notifications.registered\' event', () => {
             const tokenData = { deviceToken: '00000000000000000000000000000000' };
             const onDeviceRegisterSpy = jest.spyOn(extension, 'onDeviceRegister');
-            extension.notifications.emit('$.notifications.registered', tokenData);
-            expect(onDeviceRegisterSpy).toHaveBeenCalledWith(tokenData);
+            DeviceEventEmitter.emit('CENRegistered', tokenData);
+            expect(onDeviceRegisterSpy).toHaveBeenCalledWith(tokenData.deviceToken);
             onDeviceRegisterSpy.mockRestore();
         });
 
         test('should store device token', () => {
             const tokenData = { deviceToken: '00000000000000000000000000000000' };
-            extension.notifications.emit('$.notifications.registered', tokenData);
+            DeviceEventEmitter.emit('CENRegistered', tokenData);
             expect(extension.notificationToken).toEqual(tokenData.deviceToken);
         });
 
         test('should start delayed chats notification state change', () => {
             const tokenData = { deviceToken: '00000000000000000000000000000000' };
             const startDelayedNotificationStateChangeSpy = jest.spyOn(extension, 'startDelayedNotificationStateChange');
-            extension.notifications.emit('$.notifications.registered', tokenData);
+            DeviceEventEmitter.emit('CENRegistered', tokenData);
             expect(startDelayedNotificationStateChangeSpy).toHaveBeenCalled();
             startDelayedNotificationStateChangeSpy.mockRestore();
         });

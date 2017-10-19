@@ -275,13 +275,15 @@ export class CENotificationsExtension extends ChatEnginePlugin {
             chained = true;
         }
 
-        if (this.notificationToken !== null && this.notificationToken !== undefined &&
-            (CENotificationsExtension.canChangeState(this.chatsState[channel].states, state) || chained)) {
+        const tokenAvailable = this.notificationToken !== null && this.notificationToken !== undefined;
+        if (tokenAvailable && (CENotificationsExtension.canChangeState(this.chatsState[channel].states, state) || chained)) {
             const pushGateway = Platform.OS === 'ios' ? 'apns' : 'gcm';
             const endpoint = this.ChatEngine.pubnub.push[enable ? 'addChannels' : 'removeChannels'];
             this.chatsState[channel].states[0] = enable ? 'enabling' : 'disabling';
             endpoint({ channels: [channel], device: this.notificationToken, pushGateway }, status =>
                 this.onPushNotificationStateChangeCompletion(chat, enable, status));
+        } else if (!tokenAvailable && this.chatsState[channel].states.length && this.chatsState[channel].states[0] === 'created') {
+            this.onPushNotificationStateChangeCompletion(chat, enable, { error: {} });
         }
     }
 
@@ -379,7 +381,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @private
      */
     onDeviceRegister(notificationToken) {
-        this.notificationToken = notificationToken.deviceToken;
+        this.notificationToken = notificationToken;
         this.startDelayedNotificationStateChange();
     }
 
