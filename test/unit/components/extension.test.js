@@ -204,8 +204,34 @@ describe('unittest::CENotificationsExtension', () => {
 
         test('should handle chats which has been created before instance construction', () => {
             const onChatCreateSpy = jest.spyOn(extension, 'onChatCreate');
-            extension.ChatEngine.chats.chat1 = { channel: 'chat1', plugin: jest.fn() };
+            extension.ChatEngine.chats.chat1 = { channel: 'chat1', plugin: jest.fn(), plugins: [] };
             extension.construct();
+            expect(onChatCreateSpy).toHaveBeenCalled();
+            onChatCreateSpy.mockRestore();
+        });
+
+        test('should not replace already registered extension with \'chatEngineNotifications.chat\' namespace', () => {
+            const plugin = { namespace: 'chatEngineNotifications.chat', check: 'data' };
+            const chat1 = { channel: 'chat1', plugins: [plugin] };
+            chat1.plugin = chatPlugin => chat1.plugins.push(chatPlugin);
+            const onChatCreateSpy = jest.spyOn(extension, 'onChatCreate');
+            extension.ChatEngine.chats.chat1 = chat1;
+
+            extension.construct();
+            expect(chat1.plugins).toHaveLength(1);
+            expect(onChatCreateSpy).toHaveBeenCalled();
+            onChatCreateSpy.mockRestore();
+        });
+
+        test('should add plugin for \'chatEngineNotifications.chat\' namespace if there is different plugins registered', () => {
+            const plugin = { namespace: 'typingIndicator', check: 'data' };
+            const chat1 = { channel: 'chat1', plugins: [plugin] };
+            chat1.plugin = chatPlugin => chat1.plugins.push(chatPlugin);
+            const onChatCreateSpy = jest.spyOn(extension, 'onChatCreate');
+            extension.ChatEngine.chats.chat1 = chat1;
+
+            extension.construct();
+            expect(chat1.plugins).toHaveLength(2);
             expect(onChatCreateSpy).toHaveBeenCalled();
             onChatCreateSpy.mockRestore();
         });
@@ -748,7 +774,7 @@ describe('unittest::CENotificationsExtension', () => {
     });
 
     describe('#onChatCreate', () => {
-        const chat = { channel: 'chat1', plugin: jest.fn() };
+        const chat = { channel: 'chat1', plugin: jest.fn(), plugins: [] };
         beforeEach(() => {
             extension.chatsState = { chat1: { states: ['created'], errorCount: 0 } };
             extension.ChatEngine.chats = { chat1: chat };
@@ -792,7 +818,13 @@ describe('unittest::CENotificationsExtension', () => {
     });
 
     describe('#onChatConnect', () => {
-        const chat = { channel: 'chat1', plugin: jest.fn(), name: 'Chat' };
+        const chat = {
+            channel: 'chat1',
+            plugin: jest.fn(),
+            name: 'Chat',
+            plugins: []
+        };
+
         beforeEach(() => {
             extension.chatsState = { chat1: { states: ['created'], errorCount: 0 } };
             extension.ChatEngine.chats = { chat1: chat };
@@ -842,7 +874,13 @@ describe('unittest::CENotificationsExtension', () => {
     });
 
     describe('#onChatDisconnect', () => {
-        const chat = { channel: 'chat1', plugin: jest.fn(), name: 'Chat' };
+        const chat = {
+            channel: 'chat1',
+            plugin: jest.fn(),
+            name: 'Chat',
+            plugins: []
+        };
+
         beforeEach(() => {
             extension.chatsState = { chat1: { states: ['created'], errorCount: 0 } };
             extension.ChatEngine.chats = { chat1: chat };

@@ -437,12 +437,19 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @private
      */
     onChatCreate(data, chat) {
-        if (!this.shouldIgnoreChat(chat) && !TypeValidator.isDefined(this.chatsState[chat.channel])) {
-            this.chatsState[chat.channel] = { states: ['created'], errorCount: 0 };
-            if (this.canManagePushNotifications(chat)) {
-                this.setPushNotificationState(chat, 'enable');
+        if (!this.shouldIgnoreChat(chat)) {
+            if (!TypeValidator.isDefined(this.chatsState[chat.channel])) {
+                this.chatsState[chat.channel] = { states: ['created'], errorCount: 0 };
+                if (this.canManagePushNotifications(chat)) {
+                    this.setPushNotificationState(chat, 'enable');
+                } else {
+                    this.chatsState[chat.channel].states = ['ignored'];
+                }
             }
-            chat.plugin(this.chatMiddlewareExtension());
+
+            if (!chat.plugins.filter(plugin => plugin.namespace === 'chatEngineNotifications.chat').length) {
+                chat.plugin(this.chatMiddlewareExtension());
+            }
         }
     }
 
