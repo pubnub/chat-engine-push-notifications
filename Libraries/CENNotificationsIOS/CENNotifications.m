@@ -198,7 +198,7 @@ RCT_EXPORT_MODULE()
     if (onUserActivity) {
         payload[@"foreground"] = @NO;
     } else {
-        payload[@"foreground"] = @(CENSharedApplication().applicationState != UIApplicationStateBackground);
+        payload[@"foreground"] = @(CENSharedApplication().applicationState == UIApplicationStateActive);
     }
     if(actionIdentifier) {
         payload[@"action"] = [@{
@@ -244,9 +244,12 @@ RCT_EXPORT_METHOD(deliverInitialNotification) {
 
     NSDictionary *launchOptions = self.bridge.launchOptions;
     if (launchOptions && launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
-        NSDictionary *notification = [CENNotifications notification:launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]
-                                                       onUserAction:YES action:nil withResponseInfo:nil completion:nil];
-        [CENNotifications application:CENSharedApplication() didReceiveRemoteNotification:notification];
+        if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"ceid"]) {
+            NSMutableDictionary *notification = [[CENNotifications notification:launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]
+                                                                   onUserAction:YES action:nil withResponseInfo:nil completion:nil] mutableCopy];
+            notification[@"foreground"] = @NO;
+            [CENNotifications sendNotification:CENReceivedRemoteNotification withUserInfo:notification];
+        }
     }
 }
 
@@ -579,18 +582,6 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
     [self sendNotification:CENFailedToRegisterForRemoteNotifications withUserInfo:@{ @"error": error }];
 }
 
-+ (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-
-    if (userInfo[@"ceid"]) {
-        NSDictionary *notification = [CENNotifications notification:userInfo
-                                                       onUserAction:NO
-                                                             action:nil
-                                                   withResponseInfo:nil
-                                                         completion:nil];
-        [self sendNotification:CENReceivedRemoteNotification withUserInfo:notification];
-    }
-}
-
 + (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
 
     if (userInfo[@"ceid"]) {
@@ -683,3 +674,4 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
 
 
 @end
+

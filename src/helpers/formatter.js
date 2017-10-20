@@ -88,7 +88,7 @@ export default class CENotificationFormatter {
                         delete notificationPayload[notificationMap[platform]];
                         notificationPayload.aps = { [notificationMap[platform]]: alert };
                     }
-                    notificationPayload[dataKeyMap[platform]] = chatEnginePayload;
+                    notificationPayload[dataKeyMap[platform]] = Object.assign({}, chatEnginePayload);
                     notificationsPayload[gatewayMap[platform]] = notificationPayload;
                 }
             }

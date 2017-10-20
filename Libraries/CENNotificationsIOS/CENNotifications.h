@@ -103,15 +103,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error;
 
 /**
- * @brief      Handle remote push notification received.
- * @discussion This method fire upon transition from background.
- *
- * @param application Reference on application instance which received remote push notification.
- * @param userInfo    Reference on remote notification payload.
- */
-+ (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo;
-
-/**
  * @brief      Handle silent remote push notification in background and all notifications while in foreground.
  * @discussion This method won't be called for non-silent notifications while application in background.
  *
