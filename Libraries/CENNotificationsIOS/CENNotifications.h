@@ -6,6 +6,7 @@
  * @author Serhii Mamontov
  * @copyright © 2009-2017 PubNub, Inc.
  */
+#import <UserNotifications/UserNotifications.h>
 #import <Foundation/Foundation.h>
 #import <React/RCTEventEmitter.h>
 
@@ -132,6 +133,28 @@ NS_ASSUME_NONNULL_BEGIN
  * @param completionHandler Reference on notification processing completion handler.
  */
 + (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)(void))completionHandler;
+
+/**
+ * @brief  Handle received notification while application in foreground.
+ *
+ * @param center            Reference on notification center which called this delegate callback.
+ * @param notification      Reference on object which store information about received notification.
+ * @param completionHandler Reference on block which allow to configure whether this notification should be visible in
+ *                          foreground or not. Block accept only one argument - notification presentation type (one of
+ *                          \c UNNotificationPresentationOptions enum fields.
+ */
++ (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler;
+
+/**
+ * @brief  Handle received notification while application in foreground.
+ *
+ * @param center            Reference on notification center which called this delegate callback.
+ * @param response          Reference on object which represent user response/action for presented notification.
+ * @param completionHandler Reference on block which allow to configure whether this notification should be visible in
+ *                          foreground or not. This block should be called at the end of user response processing
+ *                          completion.
+ */
++ (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler;
 
 #endif
 

@@ -7,8 +7,6 @@
  * React native module native counterpart.
  *
  * @typedef {Object} CENNotifications
- * @property {function} deliverInitialNotification - Request native module to retrieve reference on notification which has been used to launch
- *     application.
  * @property {function} receiveMissedEvents - Inform native module what React native module is ready to listen events and would like to get any missed
  *     events (which has been sent while React native code has been loaded and initialized).
  * @property {CENApplicationIconBadgeNumberFunction} applicationIconBadgeNumber - Retrieve current application icon badge number.

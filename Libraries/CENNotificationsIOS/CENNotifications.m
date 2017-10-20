@@ -234,26 +234,6 @@ RCT_EXPORT_METHOD(formatNotificationPayload:(NSDictionary *)payload callback:(RC
 }
 
 
-/**
- * @brief      Deliver (if any) information about notification passed on launch.
- * @discussion Application can be started in response on user tap on notification. This method allow to retrieve this
- *             notification data from launch option and send it back to React Native counterpart so event listeners will
- *             be called.
- */
-RCT_EXPORT_METHOD(deliverInitialNotification) {
-
-    NSDictionary *launchOptions = self.bridge.launchOptions;
-    if (launchOptions && launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
-        if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"ceid"]) {
-            NSMutableDictionary *notification = [[CENNotifications notification:launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]
-                                                                   onUserAction:YES action:nil withResponseInfo:nil completion:nil] mutableCopy];
-            notification[@"foreground"] = @NO;
-            [CENNotifications sendNotification:CENReceivedRemoteNotification withUserInfo:notification];
-        }
-    }
-}
-
-
 #pragma mark - Notification permissions
 
 RCT_EXPORT_METHOD(applicationIconBadgeNumber:(RCTResponseSenderBlock)callback) {
@@ -617,6 +597,36 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
                                                    withResponseInfo:responseInfo
                                                          completion:completionHandler];
         [self sendNotification:CENReceivedRemoteNotification withUserInfo:notification];
+    }
+}
+
++ (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    NSDictionary *notificationPayload = notification.request.content.userInfo;
+    if (notificationPayload[@"ceid"]) {
+        [self application:CENSharedApplication() didReceiveRemoteNotification:notificationPayload
+   fetchCompletionHandler:^(UIBackgroundFetchResult result) {}];
+    }
+}
+
++ (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
+    NSString *actionIdentifier = response.actionIdentifier;
+    NSDictionary *notificationPayload = response.notification.request.content.userInfo;
+    if (notificationPayload[@"ceid"]) {
+        if ([actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
+            [self application:CENSharedApplication() didReceiveRemoteNotification:notificationPayload
+       fetchCompletionHandler:^(UIBackgroundFetchResult result) {}];
+        } else if (![actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
+            if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
+                NSString *userInput = ((UNTextInputNotificationResponse *)response).userText;
+                [self application:CENSharedApplication() handleActionWithIdentifier:actionIdentifier
+            forRemoteNotification:notificationPayload
+                 withResponseInfo:@{ UIUserNotificationActionResponseTypedTextKey: (userInput ?: @"") }
+                completionHandler:^{}];
+            } else {
+                [self application:CENSharedApplication() handleActionWithIdentifier:actionIdentifier
+            forRemoteNotification:notificationPayload completionHandler:^{}];
+            }
+        }
     }
 }
 

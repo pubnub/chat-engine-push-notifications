@@ -235,23 +235,6 @@ describe('unittest::CENotifications', () => {
         });
     });
 
-    describe('#deliverInitialNotification', () => {
-        NativeModules.CENNotifications.deliverInitialNotification = jest.fn();
-        let notifications = null;
-        beforeEach(() => {
-            notifications = new CENotifications('senderID');
-        });
-
-        test('should be function', () => {
-            expect(typeof notifications.deliverInitialNotification === 'function').toBeTruthy();
-        });
-
-        test('should call method on native module side', () => {
-            notifications.deliverInitialNotification();
-            expect(NativeModules.CENNotifications.deliverInitialNotification).toHaveBeenCalled();
-        });
-    });
-
     describe('deliveredNotifications', () => {
         NativeModules.CENNotifications.deliveredNotifications = jest.fn(callback => callback({ Pubnub: 'is awesome!' }));
         let notifications = null;

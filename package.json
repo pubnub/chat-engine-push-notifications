@@ -51,7 +51,7 @@
     "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
   },
   "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "test": "jest --ci",
     "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=/test/unit/",
@@ -76,7 +76,7 @@
       }
     },
     "coveragePathIgnorePatterns": [
-      "<rootDir>/test",
+      "<rootDir>/test/",
       "<rootDir>/node_modules/"
     ],
     "modulePathIgnorePatterns": [

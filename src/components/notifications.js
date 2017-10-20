@@ -1,4 +1,4 @@
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["applicationIconBadgeNumber","setApplicationIconBadgeNumber","deliverInitialNotification","deliveredNotifications","markNotificationAsSeen","markAllNotificationAsSeen","formatNotificationPayload"]}] */
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["applicationIconBadgeNumber","setApplicationIconBadgeNumber","deliveredNotifications","markNotificationAsSeen","markAllNotificationAsSeen","formatNotificationPayload"]}] */
 /**
  * @file Module which utilize React Native features to communicate with native counterpart.
  * @author Serhii Mamontov <sergey@pubnub.com>
@@ -174,34 +174,6 @@ export default class CENotifications extends EventEmitter2 {
         } catch (error) {
             throw error;
         }
-    }
-
-    /**
-     * Try to retrieve push notification payload which has been used to launch application.
-     * If any remote notification has been used to open application it will be sent along with `$.notifications.received` event.
-     *
-     * @example <caption>Request for initial notification</caption>
-     * import { plugin } from 'chat-engine-notifications';
-     *
-     * ChatEngine.protoPlugin('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
-     * ChatEngine.on('$.ready', () => {
-     *     ChatEngine.me.notifications.on('$.notifications.received', notification => {
-     *          // Initial messages delivered with 'foreground' set to 'false'.
-     *         if (!notification.foreground) {
-     *             console.log(`Received initial notification: ${JSON.stringify(notification.notification)}`);
-     *         }
-     *     });
-     *     ChatEngine.me.notifications.deliverInitialNotification();
-     * });
-     */
-    deliverInitialNotification() {
-        CENNotifications.deliverInitialNotification();
     }
 
     /**
