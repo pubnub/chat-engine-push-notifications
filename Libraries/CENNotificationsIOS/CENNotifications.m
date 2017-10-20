@@ -25,6 +25,7 @@ static NSString * const CENErrorUnableToRegisterBecauseOfUserReject = @"E_FAILED
 static NSDictionary *(^CENPushNotificationFormatter)(NSDictionary *payload);
 static void(^CENPermissionRequestCompletion)(BOOL granted, BOOL rejected, NSError * _Nullable error);
 
+static NSDictionary *applicationLaunchOptions;
 
 /**
  * @brief  Whether native module has event listeners from React Native side or not.
@@ -527,6 +528,12 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
 
 #pragma mark - Application delegate callbacks
 
++ (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    applicationLaunchOptions = [NSDictionary dictionaryWithDictionary:launchOptions] ?: @{};
+
+    return YES;
+}
+
 + (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
 
     BOOL granted = notificationSettings.types != UIUserNotificationTypeNone;
@@ -565,8 +572,15 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
 + (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
 
     if (userInfo[@"ceid"]) {
+        BOOL onUserAction = NO;
+        if (applicationLaunchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
+            NSDictionary *remoteNotification = applicationLaunchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+            if (remoteNotification[@"ceid"]) {
+                onUserAction = [remoteNotification[@"ceid"] isEqualToString:userInfo[@"ceid"]];
+            }
+        }
         NSDictionary *notification = [CENNotifications notification:userInfo
-                                                       onUserAction:NO
+                                                       onUserAction:onUserAction
                                                              action:nil
                                                    withResponseInfo:nil
                                                          completion:^(NSString *result) {
@@ -601,32 +615,30 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
 }
 
 + (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    NSDictionary *notificationPayload = notification.request.content.userInfo;
-    if (notificationPayload[@"ceid"]) {
-        [self application:CENSharedApplication() didReceiveRemoteNotification:notificationPayload
+    NSDictionary *userInfo = notification.request.content.userInfo;
+
+    if (userInfo[@"ceid"]) {
+        [self application:CENSharedApplication() didReceiveRemoteNotification:userInfo
    fetchCompletionHandler:^(UIBackgroundFetchResult result) {}];
     }
 }
 
 + (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-    NSString *actionIdentifier = response.actionIdentifier;
-    NSDictionary *notificationPayload = response.notification.request.content.userInfo;
-    if (notificationPayload[@"ceid"]) {
-        if ([actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
-            [self application:CENSharedApplication() didReceiveRemoteNotification:notificationPayload
-       fetchCompletionHandler:^(UIBackgroundFetchResult result) {}];
-        } else if (![actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
-            if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
-                NSString *userInput = ((UNTextInputNotificationResponse *)response).userText;
-                [self application:CENSharedApplication() handleActionWithIdentifier:actionIdentifier
-            forRemoteNotification:notificationPayload
-                 withResponseInfo:@{ UIUserNotificationActionResponseTypedTextKey: (userInput ?: @"") }
-                completionHandler:^{}];
-            } else {
-                [self application:CENSharedApplication() handleActionWithIdentifier:actionIdentifier
-            forRemoteNotification:notificationPayload completionHandler:^{}];
-            }
+    NSString *identifier = response.actionIdentifier;
+    NSDictionary *userInfo = response.notification.request.content.userInfo;
+
+    if (userInfo[@"ceid"]) {
+        NSDictionary *responseInfo = nil;
+        if ([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
+            NSString *userInput = ((UNTextInputNotificationResponse *)response).userText;
+            responseInfo = @{ UIUserNotificationActionResponseTypedTextKey: (userInput ?: @"") };
         }
+        NSDictionary *notification = [CENNotifications notification:userInfo
+                                                       onUserAction:YES
+                                                             action:identifier
+                                                   withResponseInfo:responseInfo
+                                                         completion:completionHandler];
+        [self sendNotification:CENReceivedRemoteNotification withUserInfo:notification];
     }
 }
 

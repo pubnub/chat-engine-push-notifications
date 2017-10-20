@@ -77,6 +77,18 @@ NS_ASSUME_NONNULL_BEGIN
 ///------------------------------------------------
 
 /**
+ * @brief      Handle application launch completion.
+ * @discussion Native module will save required information from application launch options for future usage.
+ *
+ * @param application   Reference on application which reported launch completion.
+ * @param launchOptions Reference on object which store list of options which has been passed to application during
+ *                      launch.
+ *
+ * @return Whether application should continue it's operation or not.
+ */
++ (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
+
+/**
  * @brief      Handle user push notification settings registration completilon.
  * @discussion This callback used for iOS version lower than 10.
  *
