@@ -77,17 +77,19 @@
     },
     "coveragePathIgnorePatterns": [
       "<rootDir>/test/",
+      "<rootDir>/demo/",
       "<rootDir>/node_modules/"
     ],
     "modulePathIgnorePatterns": [
-      "<rootDir>/demo",
+      "<rootDir>/demo/",
       "<rootDir>/node_modules/react-native/Libraries/react-native/"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/.idea",
-      "<rootDir>/Libraries",
-      "<rootDir>/coverage",
-      "<rootDir>/docs",
+      "<rootDir>/Libraries/",
+      "<rootDir>/coverage/",
+      "<rootDir>/docs/",
+      "<rootDir>/demo/",
       "<rootDir>/node_modules/"
     ],
     "notify": true,

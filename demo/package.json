@@ -1,0 +1,19 @@
+{
+  "name": "NativeToReact",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "chat-engine": "git://github.com/pubnub/chat-engine.git#0.6.1-local-chat-events",
+    "chat-engine-notifications": "^1.0.6",
+    "chat-engine-react-native": "0.0.8",
+    "chat-engine-typing-indicator": "0.0.8",
+    "react": "16.0.0-alpha.12",
+    "react-native": "^0.48.4",
+    "react-native-elements": "^0.17.0",
+    "react-native-swipeable": "^0.6.0",
+    "react-native-vector-icons": "^4.4.0"
+  }
+}
