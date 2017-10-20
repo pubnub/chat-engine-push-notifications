@@ -194,13 +194,9 @@ RCT_EXPORT_MODULE()
 
     NSMutableDictionary *payload = [@{
         @"notification": notification,
-        @"userInteraction": (actionIdentifier != nil ? @YES : @NO)
+        @"userInteraction": (actionIdentifier != nil ? @YES : @NO),
+        @"foreground": @(CENSharedApplication().applicationState == UIApplicationStateActive)
     } mutableCopy];
-    if (onUserActivity) {
-        payload[@"foreground"] = @NO;
-    } else {
-        payload[@"foreground"] = @(CENSharedApplication().applicationState == UIApplicationStateActive);
-    }
     if(actionIdentifier) {
         payload[@"action"] = [@{
             @"category": notification[@"aps"][@"category"],
