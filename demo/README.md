@@ -4,7 +4,7 @@ Few steps is required to use this application:
     ```bash
     npm install
     ```  
-2. Change  PubNub keys and [Chat Engine](https://chat-engine-docs.surge.sh/docs/) server running machine IP address in `index.ios.js`:  
+2. Change  PubNub keys and [Chat Engine](https://chat-engine-docs.surge.sh/docs/) server running machine IP address in `index.ios.js` and `index.android.js`:  
     ```js
     const ChatEngine = ChatEngineCore.create({
         publishKey: '<publish-key>',
