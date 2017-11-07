@@ -20,14 +20,14 @@ import { CENotificationsExtension } from './components/extension';
  * @example <caption>Simple setup</caption>
  * import { plugin } from 'chat-engine-notifications';
  *
- * ChatEngine.protoPlugin('Me', plugin({
+ * ChatEngine.proto('Me', plugin({
  *     events: ['$.invite', 'message'],
  *     platforms: { ios: true, android: true }
  * }));
  * @example <caption>Setup with notification formatter</caption>
  * import { plugin } from 'chat-engine-notifications';
  *
- * ChatEngine.protoPlugin('Me', plugin({
+ * ChatEngine.proto('Me', plugin({
  *     events: ['$.invite', 'message'],
  *     platforms: { ios: true, android: true },
  *     formatter: (payload) => {

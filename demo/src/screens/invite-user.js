@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, TouchableHighlight, NativeModules, TextInput, StyleSheet, Keyboard, Text, View } from 'react-native';
+import { KeyboardAvoidingView, TouchableHighlight, NativeModules, TextInput, StyleSheet, Platform, Keyboard, Text, View } from 'react-native';
 
 export default class CEPNInviteUserView extends React.Component {
     static ChatEngine = null;
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         width: 250,
         color: '#666666',
         paddingHorizontal: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         borderColor: '#CE242F',
         borderWidth: 1,
         borderRadius: 4,
@@ -122,9 +122,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
-        paddingTop: 3,
+        paddingTop: Platform.OS === 'ios' ? 3 : 6,
         marginTop: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -135,9 +135,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
-        paddingTop: 3,
+        paddingTop: Platform.OS === 'ios' ? 3 : 6,
         marginTop: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         justifyContent: 'center',
         alignItems: 'center',
         opacity: 0.3 },

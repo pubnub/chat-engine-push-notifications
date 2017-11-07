@@ -3,7 +3,7 @@
  * performed by application after it will be launched.
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
-import TypeValidator from '../helpers/utils';
+import { TypeValidator, throwError } from '../helpers/utils';
 
 
 export default class CENotificationAction {
@@ -63,29 +63,39 @@ export default class CENotificationAction {
      * Validate notification category action options.
      *
      * @param {NotificationActionConfiguration} options - Set of action configuration options.
+     * @return {Boolean} `true` in case if passed object correspond to {@link NotificationActionConfiguration} object representation.
      *
      * @throws {TypeError} in case if one of required parameters is empty or any passed parameters has unexpected data type.
      */
     static validateOptions(options) {
         if (!TypeValidator.sequence(options.identifier, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).');
+            throwError(new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).'));
+            return false;
         } else if (!TypeValidator.sequence(options.title, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected title: empty or has unexpected data type (string expected).');
+            throwError(new TypeError('Unexpected title: empty or has unexpected data type (string expected).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.activationMode, [['isOneOf', ['foreground', 'background']]])) {
-            throw new TypeError('Unexpected activation mode: empty or has unknown value (known: foreground and background).');
+            throwError(new TypeError('Unexpected activation mode: empty or has unknown value (known: foreground and background).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.authenticationRequired, [['isTypeOf', Boolean]])) {
-            throw new TypeError('Unexpected authentication: unexpected data type (boolean expected).');
+            throwError(new TypeError('Unexpected authentication: unexpected data type (boolean expected).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.destructive, [['isTypeOf', Boolean]])) {
-            throw new TypeError('Unexpected destructive: unexpected data type (boolean expected).');
+            throwError(new TypeError('Unexpected destructive: unexpected data type (boolean expected).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.behavior, [['isOneOf', ['default', 'textInput']]])) {
-            throw new TypeError('Unexpected behavior: empty or has unknown value (known: default and textInput).');
+            throwError(new TypeError('Unexpected behavior: empty or has unknown value (known: default and textInput).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.textInput, [['isTypeOf', Object], ['hasKnownKeys', ['title', 'placeholder']],
             ['hasValuesOf', String]])) {
-            throw new TypeError('Unexpected text input: empty or has unknown parameters (known: title and placeholder) of unknown data type.');
+            throwError(new TypeError('Unexpected text input: empty or has unknown parameters (known: title and placeholder) of unknown data type.'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.options, [['isTypeOf', Object],
             ['hasKnownKeys', ['authenticationRequired', 'destructive', 'foreground']], ['hasValuesOf', Boolean]])) {
-            throw new TypeError('Unexpected options: empty or has unknown parameters (known: authenticationRequired, destructive and foreground) ' +
-                'of unknown data type.');
+            throwError(new TypeError('Unexpected options: empty or has unknown parameters (known: authenticationRequired, destructive and foreground) ' +
+                'of unknown data type.'));
+            return false;
         }
+        return true;
     }
 }

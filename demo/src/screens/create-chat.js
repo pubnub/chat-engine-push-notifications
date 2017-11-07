@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, TouchableHighlight, DeviceEventEmitter, NativeModules, Keyboard, TextInput, StyleSheet, View, Text } from 'react-native';
+import { KeyboardAvoidingView, TouchableHighlight, DeviceEventEmitter, NativeModules, Keyboard, TextInput, StyleSheet, Platform, View, Text } from 'react-native';
 
 
 export default class CEPNCreateChatView extends React.Component {
@@ -29,7 +29,7 @@ export default class CEPNCreateChatView extends React.Component {
      * Handle screen rendering completion and displaying to the user.
      */
     componentDidMount() {
-        console.disableYellowBox = false;
+        console.disableYellowBox = true;
     }
 
     /**
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'stretch',
         backgroundColor: '#dbdbdb',
-        marginTop: -64
+        marginTop: Platform.OS === 'ios' ? -64 : 0
     },
     chatInfoContainer: {
         flex: 1,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         width: 250,
         color: '#666666',
         paddingHorizontal: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         borderColor: '#CE242F',
         borderWidth: 1,
         borderRadius: 4,
@@ -138,9 +138,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
-        paddingTop: 3,
+        paddingTop: Platform.OS === 'ios' ? 3 : 6,
         marginTop: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -151,9 +151,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
-        paddingTop: 3,
+        paddingTop: Platform.OS === 'ios' ? 3 : 6,
         marginTop: 10,
-        height: 30,
+        height: Platform.OS === 'ios' ? 30 : 40,
         justifyContent: 'center',
         alignItems: 'center',
         opacity: 0.3 },

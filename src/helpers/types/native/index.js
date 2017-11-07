@@ -9,15 +9,18 @@
  * @typedef {Object} CENNotifications
  * @property {function} receiveMissedEvents - Inform native module what React native module is ready to listen events and would like to get any missed
  *     events (which has been sent while React native code has been loaded and initialized).
- * @property {CENApplicationIconBadgeNumberFunction} applicationIconBadgeNumber - Retrieve current application icon badge number.
+ * @property {CENApplicationIconBadgeNumberFunction} applicationIconBadgeNumber - Retrieve current application icon badge number (**iOS only**).
  * @property {CENApplicationIconBadgeNumberChangeFunction} setApplicationIconBadgeNumber - Update application's icon badge number to specified value.
- * @property {CENFormatNotificationPayloadFunction} formatNotificationPayload - Format event payload and return resulting value with callback function.
+ * @property {CENRequestPermissionsFunction} requestPermissions - Request notification feature usage permissions (**iOS only**).
+ * @property {CENRegisterNotificationChannelsFunction} registerNotificationChannels - Register notification channels which contain information about
+ *     notification presentation (**Android only**).
+ * @property {CENRegisterNotificationActionsFunction} registerNotificationActions - Register notification handling actions (**Android only**).
+ * @property {function} deliverInitialNotification - Request native module to retrieve reference on notification which has been used to launch
+ *     application.
  * @property {CENGetDeliveredNotificationsFunction} deliveredNotifications - Retrieve list of notifications which has been delivered to device from
- *     {@link ChatEngine} users (**iOS only**).
- * @property {CENMarkNotificationSeenFunction} markNotificationAsSeen - Hide passed notification from notification centers for all devices where it
- *     has been received (**iOS only**).
- * @property {CENMarkAllNotificationsSeenFunction} markAllNotificationAsSeen - Hide all notifications from notification centers for all devices where
- *     it has been received (**iOS only**).
+ *     {@link ChatEngine} users.
+ * @property {CENFormatNotificationPayloadFunction} formatNotificationPayload - Format event payload and return resulting value with callback
+ *     function.
  */
 
 /**
@@ -39,6 +42,28 @@
  *
  * @typedef {function} CENApplicationIconBadgeNumberChangeFunction
  * @param {Number} number - value which should be shown on application's badge.
+ */
+
+/**
+ * Function which allow to request required set of permissions for notifications.
+ *
+ * @typedef {function} CENRequestPermissionsFunction
+ * @param {CEPermissions} permissions - Reference on object which contain set of required persmissions.
+ */
+
+/**
+ * Function which allow to register set of notification channels with pre-configurated notification handling.
+ *
+ * @typedef {function} CENRegisterNotificationChannelsFunction
+ * @param {NotificationChannelConfiguration[]} channels - Reference on array of notification channel configuration objects.
+ */
+
+/**
+ * Function which allow to register set of notification handling actions name along with activities which should handle notification.
+ *
+ * @typedef {function} CENRegisterNotificationActionsFunction
+ * @param {Object} actions - Reference on object where each key is name and identifier of action and as value passed name of activity which should
+ *     handle notification. Name should conform to following template `<package-name>.<path-to-class>.<activity-class-name>`.
  */
 
 /**
@@ -81,19 +106,6 @@
  *
  * @typedef {function} CENDeliveredNotificationsCallback
  * @param {CENDeliveredNotificationPayload[]} notifications - List of notifications which has been sent from another {@link ChatEngine} users.
- */
-
-/**
- * Function which allow to mark specified notification as read and remove it from notification center for all devices (**iOS only**).
- *
- * @typedef {function} CENMarkNotificationSeenFunction
- * @param {CENNotificationPayload} notification - Reference on notification which should be marked by native module as 'seen'.
- */
-
-/**
- * Function which allow to mark all notification as read and remove it from notification center for all devices (**iOS only**).
- *
- * @typedef {function} CENMarkAllNotificationsSeenFunction
  */
 
 

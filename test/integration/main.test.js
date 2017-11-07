@@ -25,12 +25,12 @@ describe('integration::ChatEngineCore', () => {
     });
 
     test('should provide interface for proto plugins', () => {
-        expect(chatEngine.protoPlugin).toBeDefined();
+        expect(chatEngine.proto).toBeDefined();
     });
 
     test('should register proto plugin', () => {
         let ignoredChats = ['chat-engine', 'Main', 'Support', 'Docs', 'Foolery'];
-        chatEngine.protoPlugin('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         expect(chatEngine.protoPlugins.Me.length).toBeGreaterThan(0);
     });
 });
@@ -47,18 +47,20 @@ describe('integration::ChatEngineNotifications', () => {
     });
 
     test('should add \'notifications\' property to Me', (done) => {
-        chatEngine.protoPlugin('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         chatEngine.on('$.ready', () => {
             expect(chatEngine.me.notifications).toBeDefined();
+            jest.clearAllTimers();
             done();
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
     test('should add middleware to Me\'s #write.#direct chat', (done) => {
-        chatEngine.protoPlugin('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         chatEngine.on('$.ready', () => {
             expect(chatEngine.me.direct.plugins.length).toBeGreaterThan(0);
+            jest.clearAllTimers();
             done();
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
@@ -66,7 +68,7 @@ describe('integration::ChatEngineNotifications', () => {
 
     test('should use user-provided formatter with no notification appending ({} returned from formatter)', (done) => {
         const formatter = () => ({});
-        chatEngine.protoPlugin('Me', plugin({
+        chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
             ignoredChats,
@@ -77,6 +79,7 @@ describe('integration::ChatEngineNotifications', () => {
                 chatEngine.me.direct.off('message', messageHandler);
                 expect(message.pn_apns).not.toBeDefined();
                 expect(message.pn_gcm).not.toBeDefined();
+                jest.clearAllTimers();
                 done();
             };
             const connectionHandler = () => {
@@ -91,7 +94,7 @@ describe('integration::ChatEngineNotifications', () => {
 
     test('should use user-provided formatter to append push notification to published message', (done) => {
         const formatter = () => ({ apns: { aps: { alert: 'Title from formatted function #1' } } });
-        chatEngine.protoPlugin('Me', plugin({
+        chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
             ignoredChats,
@@ -102,6 +105,13 @@ describe('integration::ChatEngineNotifications', () => {
                 chatEngine.me.direct.off('message', messageHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.aps.alert).toEqual(formatter().apns.aps.alert);
+                expect(message.pn_apns.cepayload).toBeDefined();
+                expect(message.pn_apns.cepayload.event).toBeDefined();
+                expect(message.pn_apns.cepayload.category).toBeDefined();
+                expect(message.pn_apns.cepayload.chat).toBeDefined();
+                expect(message.pn_apns.cepayload.data).toBeDefined();
+                expect(message.pn_apns.cepayload.sender).toBeDefined();
+                jest.clearAllTimers();
                 done();
             };
             const connectionHandler = () => {
@@ -115,14 +125,17 @@ describe('integration::ChatEngineNotifications', () => {
     });
 
     test('should use default formatter for $.invite', (done) => {
-        chatEngine.protoPlugin('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         chatEngine.on('$.ready', () => {
             const chat = new chatEngine.Chat('secret-meeting');
             const invitationHandler = (message) => {
                 chatEngine.me.direct.off('$.invite', invitationHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.aps.category).toBeDefined();
+                expect(message.pn_apns.cepayload).toBeDefined();
                 expect(message.pn_gcm).toBeDefined();
+                expect(message.pn_gcm.data.cepayload).toBeDefined();
+                jest.clearAllTimers();
                 done();
             };
             const connectionHandler = () => {
@@ -131,6 +144,35 @@ describe('integration::ChatEngineNotifications', () => {
                 chat.invite(chatEngine.me);
             };
             chat.on('$.connected', connectionHandler);
+        });
+        chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
+    });
+
+    test('should send $.notifications.seen event', (done) => {
+        const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.on('$.ready', () => {
+            const messageHandler = (message) => {
+                chatEngine.me.direct.off('$.notifications.seen', messageHandler);
+                expect(message.pn_apns).toBeDefined();
+                expect(message.pn_apns.cepayload).toBeDefined();
+                expect(message.pn_apns.cepayload.data.ceid).toEqual(notification.notification.cepayload.ceid);
+                expect(message.pn_gcm).toBeDefined();
+                expect(message.pn_gcm.data.cepayload).toBeDefined();
+                expect(message.pn_gcm.data.cepayload.data.ceid).toEqual(notification.notification.cepayload.ceid);
+                jest.clearAllTimers();
+                done();
+            };
+            const connectionHandler = () => {
+                chatEngine.me.direct.off('$.connected', connectionHandler);
+                chatEngine.me.direct.on('$.notifications.seen', messageHandler);
+                chatEngine.me.notifications.markNotificationAsSeen(notification);
+            };
+            if (!chatEngine.me.direct.connected) {
+                chatEngine.me.direct.on('$.connected', connectionHandler);
+            } else {
+                connectionHandler();
+            }
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, TouchableOpacity, DeviceEventEmitter, NativeModules, Dimensions, StyleSheet, TextInput, Keyboard, Button, Text, View } from 'react-native';
+import { KeyboardAvoidingView, TouchableOpacity, DeviceEventEmitter, NativeModules, Dimensions, StyleSheet, TextInput, Keyboard, Platform, Text, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { MessageList } from 'chat-engine-react-native';
 const TypingIndicator = require('chat-engine-typing-indicator');
@@ -25,18 +25,20 @@ export default class CEPNChatView extends React.Component {
      */
     constructor(properties) {
         super(properties);
-        console.disableYellowBox = false;
+        console.disableYellowBox = true;
         let chat = CEPNChatView.ChatEngine.chats[this.props.channel] || false;
-        this.state = { chat, whoIsTyping: [], chatInput: '', sendEnabled: false };
+        this.state = { chat, whoIsTyping: [], chatInput: '', sendEnabled: false, keyboardHeight: 0 };
         if (chat) {
             this.state.name = chat.channel.split('#').slice(-1)[0];
         }
 
+        this._keyboardDidShowListener = false;
         this._onChatClose = this.onChatClose.bind(this);
         this._onChatConnect = this.onChatConnect.bind(this);
         this._handleUserStartTyping = this.handleUserStartTyping.bind(this);
         this._handleUserStopTyping = this.handleUserStopTyping.bind(this);
-        this._onBarButtonTap = this.onBarButtonTap.bind(this);
+        this._onBarButtonTap = this.onBarButtonTap
+            .bind(this);
 
         if (this.state.chat) {
             DeviceEventEmitter.addListener('$.chat-on-react.chat.close', this._onChatClose);
@@ -51,11 +53,14 @@ export default class CEPNChatView extends React.Component {
     }
 
     /**
-     * Handle screen mounting and rendering is about to start.
+     * Handle screen rendering completion and displaying to the user.
      */
-    componentWillMount() {
+    componentDidMount() {
         if (this.state.chat.connected) {
             this.onChatConnect({}, this.state.chat)
+        }
+        if (Platform.OS === 'android') {
+            this._keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow.bind(this));
         }
     }
 
@@ -68,6 +73,13 @@ export default class CEPNChatView extends React.Component {
         CEPNChatView.ChatEngine.off('$.connected', this._onChatConnect);
         CEPNChatView.ChatEngine.off('$typingIndicator.startTyping', this._handleUserStartTyping);
         CEPNChatView.ChatEngine.off('$typingIndicator.stopTyping', this._handleUserStopTyping);
+
+        if (Platform.OS === 'android' && this._keyboardDidShowListener)
+            this._keyboardDidShowListener.remove();
+    }
+
+    keyboardDidShow(event){
+        this.setState({ keyboardHeight: event.endCoordinates.height });
     }
 
     /**
@@ -111,7 +123,7 @@ export default class CEPNChatView extends React.Component {
                 <View style={ styles().chatContainer }>
                     <MessageList chat={ this.state.chat } me={ CEPNChatView.ChatEngine.me } />
                 </View>
-                <KeyboardAvoidingView behavior={ 'padding' }>
+                <KeyboardAvoidingView behavior={ 'position' } keyboardVerticalOffset={ -this.state.keyboardHeight }>
                     <View style={ styles(this.state.whoIsTyping.length > 0).typingIndicator }>
                         <Text style={ styles().typingIndicatorLabel }>{ this.typingIndicatorText() }</Text>
                     </View>

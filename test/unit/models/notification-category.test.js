@@ -18,12 +18,13 @@ describe('unittest::CENotificationCategory', () => {
         options: { foreground: false, destructive: true }
     });
     const minimumConfiguration = { identifier: 'my-category-identifier', actions: [openAction, ignoreAction] };
+    let configuration;
+
+    beforeEach(() => {
+        configuration = Object.assign({}, minimumConfiguration);
+    });
 
     describe('#constructor', () => {
-        let configuration;
-        beforeEach(() => {
-            configuration = Object.assign({}, minimumConfiguration);
-        });
 
         test('should create instance', () => {
             expect(new CENotificationCategory(minimumConfiguration)).toBeDefined();
@@ -70,6 +71,7 @@ describe('unittest::CENotificationCategory', () => {
             expect(() => new CENotificationCategory(configuration))
                 .toThrowError(/Unexpected values type \(array expected\)/);
         });
+
         test('should throw TypeError when \'options.actions\' is empty Array', () => {
             configuration.actions = [];
             expect(() => new CENotificationCategory(configuration))
@@ -120,6 +122,51 @@ describe('unittest::CENotificationCategory', () => {
                 actions: minimumConfiguration.actions.map(action => action.payload())
             });
             expect(category.payload()).toEqual(serializedCategory);
+        });
+    });
+
+    describe('#validateOptions', () => {
+        const originalNodeEnv = process.env.NODE_ENV;
+
+        beforeEach(() => {
+            process.env.NODE_ENV = 'production';
+        });
+
+        afterEach(() => {
+            process.env.NODE_ENV = originalNodeEnv;
+        });
+
+
+        test('should be function', () => {
+            expect(typeof CENotificationCategory.validateOptions === 'function').toBeTruthy();
+        });
+
+        test('should return \'true\' for valid category configuration', () => {
+            expect(CENotificationCategory.validateOptions(configuration)).toBeTruthy();
+        });
+
+        test('should not throw when \'options\' doesn\'t have \'identifier\' in it in non-test environment', () => {
+            delete configuration.identifier;
+            expect(() => CENotificationCategory.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationCategory.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when at least one of \'options.bodyPlaceholder\' entries is not type of String in non-test environment', () => {
+            configuration.bodyPlaceholder = ['siri', 2010];
+            expect(() => CENotificationCategory.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationCategory.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options.context\' is not type of String in non-test environment', () => {
+            configuration.context = ['siri', 2010];
+            expect(() => CENotificationCategory.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationCategory.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options\' is empty Array in non-test environment', () => {
+            configuration.actions = [];
+            expect(() => CENotificationCategory.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationCategory.validateOptions(configuration)).toBeFalsy();
         });
     });
 });

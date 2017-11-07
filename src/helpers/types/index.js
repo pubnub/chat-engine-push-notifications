@@ -11,8 +11,6 @@
  * @property {!String[]} events - List of events for which push notification payload should be created.
  * @property {String[]} [ignoredChats='#read.#feed'] - List of chats for which it is not required to register on push notifications.
  * @property {!CEPlatforms} platforms Available platforms for push notification should be constructed when {@link ChatEngine} send events.
- * @property {!String} [senderID] - Registered application which is enabled for notifications sending. This value can be received in Google's console
- *     (**Android only**).
  * @property {Boolean} [markAsSeen=true] - Whether received notification should be marked as `seen` or not when received (when `$.notification` event
  *     is sent).
  * @property {CEFormatterCallback} [formatter] - Called each time when {@link ChatEngine} is about to send one of tracked `events` make layout
@@ -62,6 +60,21 @@
  *     `minimal`.
  * @property {!CENotificationAction[]} actions - List of notification handling actions ({@link CENotificationAction}) which can be presented to the
  *     user.
+ */
+
+/**
+ * Notification channel configuration.
+ *
+ * @typedef {Object} NotificationChannelConfiguration
+ * @property {String} id - Unique identifier.
+ * @property {String} name - Displayable name.
+ * @property {String} [importance=importanceHigh] - The custom notification layout importance. Possible values: `importanceNone`, `importanceMin`,
+ *     `importanceLow`, `importanceHigh` and `importanceDefault`.
+ * @property {Boolean} [vibration=true] - Whether notification which arrive to this channel should make phone vibrate or not.
+ * @property {Number[]} [vibrationPattern=[1000]] - Device vibration pattern (sequence of timing for vibrate and pause).
+ * @property {Boolean} [lights=true] - Whether notification which arrive to this channel should user lights or not.
+ * @property {String} [lightColor=#00FF00] - HEX color code which should be used for light.
+ * @property {String} [sound] - Name of sound which should be played when notification arrive to this channel.
  */
 
 /**

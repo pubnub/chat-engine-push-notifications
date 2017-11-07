@@ -11,12 +11,12 @@ describe('unittest::CENotificationAction', () => {
         activationMode: 'foreground',
         options: { foreground: true }
     };
+    let configuration;
+    beforeEach(() => {
+        configuration = Object.assign({}, minimumConfiguration);
+    });
 
     describe('#constructor', () => {
-        let configuration;
-        beforeEach(() => {
-            configuration = Object.assign({}, minimumConfiguration);
-        });
         test('should create instance', () => {
             delete configuration.activationMode;
             expect(new CENotificationAction(configuration)).toBeDefined();
@@ -142,6 +142,75 @@ describe('unittest::CENotificationAction', () => {
             let action = new CENotificationAction(minimumConfiguration);
             const serializedAction = Object.assign({ activationMode: 'background', behavior: 'default' }, minimumConfiguration);
             expect(action.payload()).toEqual(serializedAction);
+        });
+    });
+
+    describe('#validateOptions', () => {
+        const originalNodeEnv = process.env.NODE_ENV;
+
+        beforeEach(() => {
+            process.env.NODE_ENV = 'production';
+        });
+
+        afterEach(() => {
+            process.env.NODE_ENV = originalNodeEnv;
+        });
+
+
+        test('should be function', () => {
+            expect(typeof CENotificationAction.validateOptions === 'function').toBeTruthy();
+        });
+
+        test('should return \'true\' for valid action configuration', () => {
+            expect(CENotificationAction.validateOptions(configuration)).toBeTruthy();
+        });
+
+        test('should not throw when \'options\' doesn\'t have \'identifier\' in it in non-test environment', () => {
+            delete configuration.identifier;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options\' doesn\'t have \'title\' in it in non-test environment', () => {
+            delete configuration.title;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options.activationMode\' is not type of String in non-test environment', () => {
+            configuration.activationMode = 2010;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options.authenticationRequired\' is not type of Boolean in non-test environment', () => {
+            configuration.authenticationRequired = 2010;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options.destructive\' is not type of Boolean in non-test environment', () => {
+            configuration.destructive = 2010;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw when \'options.behavior\' is not type of String in non-test environment', () => {
+            configuration.behavior = 2010;
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw TypeError when \'options.textInput\' is not type of Object in non-test environment', () => {
+            configuration.textInput = [2010];
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
+        });
+
+        test('should not throw TypeError when \'options.options\' is not type of Object in non-test environment', () => {
+            configuration.options = [2010];
+            expect(() => CENotificationAction.validateOptions(configuration)).not.toThrowError();
+            expect(CENotificationAction.validateOptions(configuration)).toBeFalsy();
         });
     });
 });

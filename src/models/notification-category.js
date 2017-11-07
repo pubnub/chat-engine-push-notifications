@@ -3,7 +3,7 @@
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
 import CENotificationAction from './notification-action';
-import TypeValidator from '../helpers/utils';
+import { TypeValidator, throwError } from '../helpers/utils';
 
 
 export default class CENotificationCategory {
@@ -77,18 +77,24 @@ export default class CENotificationCategory {
      * Validate notification category options.
      *
      * @param {NotificationCategoryConfiguration} options - Set of category configuration options.
+     * @return {Boolean} `true` in case if passed object correspond to {@link NotificationCategoryConfiguration} object representation.
      *
      * @throws {TypeError} in case if one of required parameters is empty or any passed parameters has unexpected data type.
      */
     static validateOptions(options) {
         if (!TypeValidator.sequence(options.identifier, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).');
+            throwError(new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.bodyPlaceholder, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected placeholder: empty or has unexpected data type (string expected).');
+            throwError(new TypeError('Unexpected placeholder: empty or has unexpected data type (string expected).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.context, [['isTypeOf', String], ['isOneOf', ['default', 'minimal']]])) {
-            throw new TypeError('Unexpected context: empty or has unknown value (known: default and minimal).');
+            throwError(new TypeError('Unexpected context: empty or has unknown value (known: default and minimal).'));
+            return false;
         } else if (!TypeValidator.sequenceIfDefined(options.actions, ['notEmpty', ['isArrayOf', CENotificationAction]])) {
-            throw new TypeError('Unexpected actions: empty or has unexpected data type (CENotificationAction expected).');
+            throwError(new TypeError('Unexpected actions: empty or has unexpected data type (CENotificationAction expected).'));
+            return false;
         }
+        return true;
     }
 }

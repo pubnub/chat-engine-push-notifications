@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
   spec.requires_arc = true
 
   spec.preserve_paths = "package.json", "LICENSE"
-  spec.source_files = "Libraries/*IOS/**/*.{h,m}"
+  spec.source_files = "Libraries/ios/**/*.{h,m}"
   spec.header_dir   = "CENNotifications"
 
   spec.license = { 

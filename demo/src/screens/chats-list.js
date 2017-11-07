@@ -1,7 +1,8 @@
 import React from 'react';
-import { KeyboardAvoidingView, TouchableHighlight, DeviceEventEmitter, NativeModules, Dimensions, StyleSheet, FlatList, View, Text } from 'react-native';
+import { KeyboardAvoidingView, TouchableHighlight, DeviceEventEmitter, NativeModules, Dimensions, StyleSheet, FlatList, Platform, View, Text } from 'react-native';
 import { CENInvitationNotificationCategory } from 'chat-engine-notifications';
 import Swipeable from 'react-native-swipeable';
+import CEPNCreateChatView from "./create-chat";
 
 const { width, height } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ export default class CEPNChatsListView extends React.Component {
     constructor(properties) {
         super(properties);
         this._ignoredChats = ['chat-engine', '#read.#feed', '#write.#direct', '#Main', '#Support', '#Docs', '#Foolery'];
+        this._chatsList = [];
         this.state = {
             rightActionActivated: false,
             scrollEnabled: true,
@@ -56,13 +58,15 @@ export default class CEPNChatsListView extends React.Component {
 
     componentDidUpdate() {
         if (!this._updatedForUser && this.state.username) {
-            // Handle user login.
             this._updatedForUser = true;
             NativeModules.CEPNChatManager.setChatsListTitleVisible(true);
-            NativeModules.CEPNChatManager.addBarButtons([{ identifier: 'create.chat.button', type: 'system', title: 'add' }], 'right', true);
+            if (Platform.OS === 'ios') {
+                NativeModules.CEPNChatManager.addBarButtons([{ identifier: 'create.chat.button', type: 'system', title: 'add' }], 'right', true);
+            } else {
+                NativeModules.CEPNChatManager.addBarButtons([{ identifier: 'create.chat.button', title: '+' }], 'right', true);
+            }
             DeviceEventEmitter.addListener('$.barButton.tap', this._onBarButtonTap);
         } else if (this._updatedForUser && !this.state.username) {
-            // Clean up after user logged out.
             this._updatedForUser = false;
             NativeModules.CEPNChatManager.setChatsListTitleVisible(false);
             NativeModules.CEPNChatManager.addBarButtons([], 'right', true);
@@ -76,7 +80,24 @@ export default class CEPNChatsListView extends React.Component {
      * Handle screen rendering completion and displaying to the user.
      */
     componentDidMount() {
-        console.disableYellowBox = false;
+        console.disableYellowBox = true;
+        if (CEPNChatsListView.ChatEngine.ready) {
+            this._onChatEngineReady();
+            if (!this.state.chatsList.length) {
+                Object.keys(CEPNChatsListView.ChatEngine.chats).forEach(channelName =>
+                    this.onChatCreate({}, CEPNChatsListView.ChatEngine.chats[channelName], false));
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        // Clean up after user logged out.
+        this._updatedForUser = false;
+        NativeModules.CEPNChatManager.setChatsListTitleVisible(false);
+        NativeModules.CEPNChatManager.addBarButtons([], 'right', true);
+        DeviceEventEmitter.removeListener('$.barButton.tap', this._onBarButtonTap);
+        DeviceEventEmitter.removeListener('$.chat-on-react.open.created', this._onChatCreateByUser);
+        DeviceEventEmitter.removeListener('$.chat-on-react.chat.close', this._onChatClose);
     }
 
     /**
@@ -85,6 +106,10 @@ export default class CEPNChatsListView extends React.Component {
     onChatEngineReady() {
         this.setState({ username: CEPNChatsListView.ChatEngine.me.uuid });
         CEPNChatsListView.ChatEngine.me.notifications.on('$.notifications.received', this._onNotification);
+        CEPNChatsListView.ChatEngine.me.notifications.registerNotificationActions({ Accept: 'default', Reject: 'none' });
+        CEPNChatsListView.ChatEngine.me.notifications.registerNotificationChannels([
+            { id: 'cennotifications', name: 'CENNotifications Channel' }
+        ]);
         CEPNChatsListView.ChatEngine.me.notifications.requestPermissions({alert: true, badge: false, sound: true},
             [new CENInvitationNotificationCategory()])
             .then(permissions => console.log('Granted with permissions:', JSON.stringify(permissions)))
@@ -96,7 +121,8 @@ export default class CEPNChatsListView extends React.Component {
             const name = chat.channel.split('#').splice(-1)[0];
             const storedChatData = this.state.chatsList.filter(chatData => chatData.name === name);
             if (!storedChatData.length) {
-                this.setState({ chatsList: this.state.chatsList.concat({ chat, name, selected: false }) }, () => {
+                this._chatsList.push({ chat, name, selected: false });
+                this.setState({ chatsList: this._chatsList }, () => {
                     if (byUser) {
                         this.onChatOpen(chat);
                     }
@@ -134,7 +160,7 @@ export default class CEPNChatsListView extends React.Component {
                 this._selectedChat = false;
             }
             chatsList[0].selected = false;
-            this.setState({ chatsList: this.state.chatsList });
+            this.setState({ chatsList: this._chatsList });
         }
     }
 
@@ -145,7 +171,7 @@ export default class CEPNChatsListView extends React.Component {
         if (!this._selectedChat || this._selectedChat.name !== chatData.name) {
             this._selectedChat = chatData;
             this._selectedChat.selected = true;
-            this.setState({ chatsList: this.state.chatsList });
+            this.setState({ chatsList: this._chatsList });
             NativeModules.CEPNChatManager.showChat({ channel: chatData.chat.channel, name: chatData.name });
         }
     }
@@ -170,8 +196,9 @@ export default class CEPNChatsListView extends React.Component {
 
     onNotification(notification) {
         if (notification.userInteraction) {
-            const category = notification.notification.aps.category;
-            if (category === 'com.pubnub.chat-engine.invite' && notification.action.identifier && notification.action.identifier === 'accept') {
+            const category = notification.notification.cepayload.category;
+            let action = notification.action !== null && notification.action !== undefined ? notification.action.identifier : false;
+            if (category === 'com.pubnub.chat-engine.invite' && ((action && action.toLowerCase() === 'accept') || !action)) {
                 if (this._chatToJoin) {
                     this.joinToChat();
                 }
@@ -195,18 +222,23 @@ export default class CEPNChatsListView extends React.Component {
             return (<View style={ styles.container }/>);
         }
 
+        if (!this.state.chatsList.length) {
+            return (
+                <KeyboardAvoidingView style={ styles.container } behavior={ 'padding' }>
+                    <View style={ styles.loaderHolder }><Text>No active chats</Text></View>
+                </KeyboardAvoidingView>
+            )
+        }
+
         return (
             <KeyboardAvoidingView style={ styles.container } behavior={ 'padding' }>
-                {!this.state.chatsList.length ?
-                    (<View style={ styles.loaderHolder }><Text>No active chats</Text></View>) :
-                    (<FlatList
-                        data={ this.state.chatsList }
-                        extraData={ this.state }
-                        keyExtractor={ item => item.name }
-                        renderItem={({ item }) => this.renderRow(item) }
-                        scrollEnabled={ this.state.scrollEnabled }
-                    />)
-                }
+                <FlatList
+                    data={ this.state.chatsList }
+                    extraData={ this.state }
+                    keyExtractor={ item => item.name }
+                    renderItem={({ item }) => this.renderRow(item) }
+                    scrollEnabled={ this.state.scrollEnabled }
+                />
             </KeyboardAvoidingView>
         )
     }

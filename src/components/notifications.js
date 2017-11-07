@@ -1,4 +1,4 @@
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["applicationIconBadgeNumber","setApplicationIconBadgeNumber","deliveredNotifications","markNotificationAsSeen","markAllNotificationAsSeen","formatNotificationPayload"]}] */
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["applicationIconBadgeNumber","setApplicationIconBadgeNumber","requestPermissions","registerNotificationChannels","registerNotificationActions","deliverInitialNotification","deliveredNotifications","markNotificationAsSeen","markAllNotificationAsSeen","formatNotificationPayload"]}] */
 /**
  * @file Module which utilize React Native features to communicate with native counterpart.
  * @author Serhii Mamontov <sergey@pubnub.com>
@@ -6,7 +6,7 @@
 import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { EventEmitter2 } from 'eventemitter2';
 import CENotificationCategory from '../models/notification-category';
-import TypeValidator from '../helpers/utils';
+import { TypeValidator, throwError } from '../helpers/utils';
 
 const { CENNotifications } = NativeModules;
 
@@ -26,21 +26,9 @@ export default class CENotifications extends EventEmitter2 {
 
     /**
      * Create and configure chat engine notifications handler and represented.
-     *
-     * @param {!String} [senderID] - Reference on notification sender registered with Google Cloud Messaging / Firebase.
-     *
-     * @throws {TypeError} in case if in Android environment senderID` is empty or has unexpected data type (string expected).
      */
-    constructor(senderID) {
-        if (Platform.OS === 'android' && !TypeValidator.sequence(senderID, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected sender ID: empty or has unexpected data type (string expected).');
-        }
+    constructor() {
         super({ newListener: false, maxListeners: 50, verboseMemoryLeak: true });
-        /**
-         * @type {String}
-         * @private
-         */
-        this.senderID = senderID || null;
 
         /**
          * Stores whether instance is de-initializing.
@@ -77,7 +65,7 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Get current application icon badge number</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
@@ -92,10 +80,13 @@ export default class CENotifications extends EventEmitter2 {
      * @throws {TypeError} in case if passed `callback` is not type of _function_.
      */
     applicationIconBadgeNumber(callback) {
-        if (!TypeValidator.isTypeOf(callback, 'function')) {
-            throw new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).');
+        if (Platform.OS === 'ios') {
+            if (!TypeValidator.isTypeOf(callback, 'function')) {
+                throwError(new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).'));
+                return;
+            }
+            CENNotifications.applicationIconBadgeNumber(callback);
         }
-        CENNotifications.applicationIconBadgeNumber(callback);
     }
 
     /**
@@ -106,7 +97,7 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Set current application icon badge number</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
@@ -121,7 +112,8 @@ export default class CENotifications extends EventEmitter2 {
      */
     setApplicationIconBadgeNumber(number) {
         if (!TypeValidator.isTypeOf(number, Number)) {
-            throw new TypeError('Unexpected icon badge number: undefined or has unexpected data type (number expected).');
+            throwError(new TypeError('Unexpected icon badge number: undefined or has unexpected data type (number expected).'));
+            return;
         }
         CENNotifications.setApplicationIconBadgeNumber(number);
     }
@@ -137,7 +129,7 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Permissions request</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
@@ -164,16 +156,111 @@ export default class CENotifications extends EventEmitter2 {
                 return Promise.reject(TypeError('Unexpected categories: unexpected categories entry data type (CENotificationCategory instance ' +
                     'expected).'));
             }
-        }
-        try {
-            if (Platform.OS === 'ios') {
+
+            try {
                 const serializedCategories = (categories || []).map(category => category.payload());
                 return await CENNotifications.requestPermissions(permissions, serializedCategories);
+            } catch (error) {
+                throw error;
             }
-            return await CENNotifications.requestPermissions(this.senderID);
-        } catch (error) {
-            throw error;
+        } else {
+            return Promise.resolve({});
         }
+    }
+
+    /**
+     * Ask native module to register notification channels on Android.
+     *
+     * @param {NotificationChannelConfiguration[]} channels - List of notification channel configuration objects.
+     *
+     * @example <caption>Permissions request</caption>
+     * import { plugin } from 'chat-engine-notifications';
+     *
+     * ChatEngine.proto('Me', plugin({
+     *     events: ['$.invite', 'message'],
+     *     platforms: { ios: true, android: true }
+     * }));
+     *
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
+     * // '$.ready' event.
+     * ChatEngine.on('$.ready', () =>
+     *     ChatEngine.me.notifications.registerNotificationChannels([
+     *         { id: 'unique-id , name: 'defaultChannel', lights: false }
+     *     ])
+     * );
+     *
+     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has unexpected data type.
+     */
+    registerNotificationChannels(channels) {
+        if (Platform.OS === 'android') {
+            if (!TypeValidator.isArrayOf(channels, Object)) {
+                throwError(new TypeError('Unexpected channels: has unexpected data type (array expected) with unknown value types (object ' +
+                    'expected).'));
+                return;
+            }
+            CENNotifications.registerNotificationChannels(channels);
+        }
+    }
+
+    /**
+     * Ask native module to register for notification actions on Android.
+     *
+     * @param {Object} actions - Object which contain name of actions and target activity name as values. Name should conform to following template
+     *     `<package-name>.<path-to-class>.<activity-class-name>`. (**Android only**).
+     *     Pass `default` as value to show launcher activity.
+     *     Pass `none` as value to keep application closed.
+     *
+     * @example <caption>Permissions request</caption>
+     * import { plugin } from 'chat-engine-notifications';
+     *
+     * ChatEngine.proto('Me', plugin({
+     *     events: ['$.invite', 'message'],
+     *     platforms: { ios: true, android: true }
+     * }));
+     *
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
+     * // '$.ready' event.
+     * ChatEngine.on('$.ready', () => ChatEngine.me.notifications.registerNotificationActions({ Accept: 'JoinScreen', Reject: 'none' }));
+     *
+     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has unexpected data type.
+     */
+    registerNotificationActions(actions) {
+        if (Platform.OS === 'android') {
+            if (!TypeValidator.sequence(actions, [['isTypeOf', Object], ['hasValuesOf', String]])) {
+                throwError(new TypeError('Unexpected actions: empty or has unexpected data type (array expected) with unknown value types (string ' +
+                    'expected).'));
+                return;
+            }
+            CENNotifications.registerNotificationActions(actions);
+        }
+    }
+
+    /**
+     * Try to retrieve push notification payload which has been used to launch application.
+     * If any remote notification has been used to open application it will be sent along with `$.notifications.received` event.
+     *
+     * @example <caption>Request for initial notification</caption>
+     * import { plugin } from 'chat-engine-notifications';
+     *
+     * ChatEngine.proto('Me', plugin({
+     *     events: ['$.invite', 'message'],
+     *     platforms: { ios: true, android: true }
+     *  }));
+     *
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
+     * // '$.ready' event.
+     * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.notifications.on('$.notifications.received', notification => {
+     *          // Initial messages delivered with 'foreground' set to 'false'.
+     *         if (!notification.foreground) {
+     *             console.log(`Received initial notification: ${JSON.stringify(notification.notification)}`);
+     *         }
+     *     });
+     *     ChatEngine.me.notifications.deliverInitialNotification();
+     * });
+     */
+    deliverInitialNotification() {
+        CENNotifications.deliverInitialNotification();
     }
 
     /**
@@ -185,7 +272,7 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Request for all delivered notifications</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
@@ -203,63 +290,10 @@ export default class CENotifications extends EventEmitter2 {
      */
     deliveredNotifications(callback) {
         if (!TypeValidator.isTypeOf(callback, 'function')) {
-            throw new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).');
+            throwError(new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).'));
+            return;
         }
         CENNotifications.deliveredNotifications(callback);
-    }
-
-    /**
-     * Hide passed notification from notification centers for all devices where it has been received (**iOS only**).
-     *
-     * @param {CENNotificationPayload} notification - Reference on notification which should be marked by native module as 'seen'.
-     *
-     * @example <caption>Mark received notification as seen</caption>
-     * import { plugin } from 'chat-engine-notifications';
-     *
-     * ChatEngine.protoPlugin('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
-     * ChatEngine.on('$.ready', () => {
-     *     ChatEngine.me.notifications.on('$.notifications.received', notification => {
-     *         console.log(`Received notification: ${JSON.stringify(notification.notification)}`);
-     *         ChatEngine.me.notifications.markNotificationAsSeen(notification);
-     *     });
-     * });
-     *
-     * @throws {TypeError} in case if passed `notification` is not type of _object_ or empty.
-     */
-    markNotificationAsSeen(notification) {
-        if (!TypeValidator.sequence(notification, ['notEmpty', ['isTypeOf', Object]])) {
-            throw new TypeError('Unexpected notification: empty or has unexpected data type (object expected).');
-        }
-        this.emit('$.notifications.seen');
-        CENNotifications.markNotificationAsSeen(notification);
-    }
-
-    /**
-     * Hide all notifications from notification centers for all devices where it has been received (**iOS only**).
-     *
-     * @example <caption>Mark all delivered notifications as seen</caption>
-     * import { plugin } from 'chat-engine-notifications';
-     *
-     * ChatEngine.protoPlugin('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
-     * ChatEngine.on('$.ready', () => {
-     *     ChatEngine.me.notifications.markAllNotificationAsSeen();
-     * });
-     */
-    markAllNotificationAsSeen() {
-        this.emit('$.notifications.seen');
-        CENNotifications.markAllNotificationAsSeen();
     }
 
     /**
@@ -275,9 +309,11 @@ export default class CENotifications extends EventEmitter2 {
      */
     formatNotificationPayload(payload, callback) {
         if (!TypeValidator.sequence(payload, ['notEmpty', ['isTypeOf', Object]])) {
-            throw new TypeError('Unexpected payload: empty or has unexpected data type (object expected).');
+            throwError(new TypeError('Unexpected payload: empty or has unexpected data type (object expected).'));
+            return;
         } else if (!TypeValidator.isTypeOf(callback, 'function')) {
-            throw new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).');
+            throwError(new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).'));
+            return;
         }
         CENNotifications.formatNotificationPayload(payload, callback);
     }
@@ -330,11 +366,14 @@ export default class CENotifications extends EventEmitter2 {
      */
     onNotification(payload) {
         if (!TypeValidator.sequence(payload, ['notEmpty', ['isTypeOf', Object]])) {
-            throw new TypeError('Unexpected payload: empty or has unexpected data type (object expected).');
+            throwError(new TypeError('Unexpected payload: empty or has unexpected data type (object expected).'));
+            return;
         }
 
         if (TypeValidator.isTypeOf(payload.action, Object)) {
-            payload.action.completion();
+            if (TypeValidator.isTypeOf(payload.action.completion, 'function')) {
+                payload.action.completion();
+            }
         } else if (TypeValidator.isTypeOf(payload.completion, 'function')) {
             payload.completion('noData');
         }

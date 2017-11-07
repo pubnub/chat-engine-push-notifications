@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00498CFBCD3F85E316DBE3CA /* libPods-ChatOnReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EBC86F3EF8A440BFFFD81FDD /* libPods-ChatOnReact.a */; };
 		79048A4F1F961A5B00A29059 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 79048A4E1F961A5B00A29059 /* main.m */; };
 		798B5CBE1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CBD1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m */; };
 		798B5CC11F97F63A007CB9B6 /* CEPNCreateChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CC01F97F63A007CB9B6 /* CEPNCreateChatViewController.m */; };
@@ -15,7 +14,7 @@
 		798B5CC61F98E7C9007CB9B6 /* CEPNInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CC51F98E7C9007CB9B6 /* CEPNInviteUserViewController.m */; };
 		799C6A301F973E090078BAB0 /* CEPNAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */; };
 		799C6A311F973E090078BAB0 /* CEPNChatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */; };
-		799C6A321F973E090078BAB0 /* CEPNCtatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A2D1F973E090078BAB0 /* CEPNCtatViewController.m */; };
+		799C6A321F973E090078BAB0 /* CEPNChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */; };
 		799C6A3E1F973E2E0078BAB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A371F973E2E0078BAB0 /* Assets.xcassets */; };
 		799C6A3F1F973E2E0078BAB0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A391F973E2E0078BAB0 /* LaunchScreen.storyboard */; };
 		799C6A401F973E2E0078BAB0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A3B1F973E2E0078BAB0 /* Main.storyboard */; };
@@ -27,7 +26,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		69E62F5D20420BF72301052C /* Pods-ChatOnReact.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatOnReact.release.xcconfig"; path = "Pods/Target Support Files/Pods-ChatOnReact/Pods-ChatOnReact.release.xcconfig"; sourceTree = "<group>"; };
 		79048A391F961A5B00A29059 /* ChatOnReact.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatOnReact.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79048A4E1F961A5B00A29059 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		798B5CBC1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+CEPNBarButtonItem.h"; sourceTree = "<group>"; };
@@ -42,8 +40,8 @@
 		799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNAppDelegate.m; sourceTree = "<group>"; };
 		799C6A2A1F973E090078BAB0 /* CEPNChatsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNChatsViewController.h; sourceTree = "<group>"; };
 		799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNChatsViewController.m; sourceTree = "<group>"; };
-		799C6A2C1F973E090078BAB0 /* CEPNCtatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNCtatViewController.h; sourceTree = "<group>"; };
-		799C6A2D1F973E090078BAB0 /* CEPNCtatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNCtatViewController.m; sourceTree = "<group>"; };
+		799C6A2C1F973E090078BAB0 /* CEPNChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNChatViewController.h; sourceTree = "<group>"; };
+		799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNChatViewController.m; sourceTree = "<group>"; };
 		799C6A351F973E2E0078BAB0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		799C6A371F973E2E0078BAB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		799C6A3A1F973E2E0078BAB0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -57,8 +55,6 @@
 		79B2B9031F979AEB00001726 /* RCTConvert+CEPNChatManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+CEPNChatManager.h"; sourceTree = "<group>"; };
 		79B2B9041F979AEB00001726 /* RCTConvert+CEPNChatManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+CEPNChatManager.m"; sourceTree = "<group>"; };
 		79B2B9071F97B60700001726 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
-		C9DA135AC2184720283D7227 /* Pods-ChatOnReact.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ChatOnReact.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ChatOnReact/Pods-ChatOnReact.debug.xcconfig"; sourceTree = "<group>"; };
-		EBC86F3EF8A440BFFFD81FDD /* libPods-ChatOnReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ChatOnReact.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,37 +62,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00498CFBCD3F85E316DBE3CA /* libPods-ChatOnReact.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		54FC649580605D02937C7EC0 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				C9DA135AC2184720283D7227 /* Pods-ChatOnReact.debug.xcconfig */,
-				69E62F5D20420BF72301052C /* Pods-ChatOnReact.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		771040B7ECC8B5C3A4B7140B /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				EBC86F3EF8A440BFFFD81FDD /* libPods-ChatOnReact.a */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		79048A301F961A5B00A29059 = {
 			isa = PBXGroup;
 			children = (
 				79048A3B1F961A5B00A29059 /* ChatOnReact */,
 				79048A3A1F961A5B00A29059 /* Products */,
-				54FC649580605D02937C7EC0 /* Pods */,
-				771040B7ECC8B5C3A4B7140B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -138,8 +114,8 @@
 				799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */,
 				799C6A2A1F973E090078BAB0 /* CEPNChatsViewController.h */,
 				799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */,
-				799C6A2C1F973E090078BAB0 /* CEPNCtatViewController.h */,
-				799C6A2D1F973E090078BAB0 /* CEPNCtatViewController.m */,
+				799C6A2C1F973E090078BAB0 /* CEPNChatViewController.h */,
+				799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */,
 				79B2B8FE1F97764800001726 /* CEPNAuthorizationViewController.h */,
 				79B2B8FF1F97764800001726 /* CEPNAuthorizationViewController.m */,
 				798B5CBF1F97F63A007CB9B6 /* CEPNCreateChatViewController.h */,
@@ -246,12 +222,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79048A521F961A5B00A29059 /* Build configuration list for PBXNativeTarget "ChatOnReact" */;
 			buildPhases = (
-				BB7B7B7EE6A74B21EE743618 /* [CP] Check Pods Manifest.lock */,
 				79048A351F961A5B00A29059 /* Sources */,
 				79048A361F961A5B00A29059 /* Frameworks */,
 				79048A371F961A5B00A29059 /* Resources */,
-				5F8EA54C846AD944A650C4FC /* [CP] Embed Pods Frameworks */,
-				55B5ECBE858C49222F1DF056 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -276,6 +249,9 @@
 						CreatedOnToolsVersion = 9.0.1;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.Push = {
 								enabled = 1;
 							};
@@ -316,57 +292,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		55B5ECBE858C49222F1DF056 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChatOnReact/Pods-ChatOnReact-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5F8EA54C846AD944A650C4FC /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ChatOnReact/Pods-ChatOnReact-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BB7B7B7EE6A74B21EE743618 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-ChatOnReact-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		79048A351F961A5B00A29059 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -380,7 +305,7 @@
 				799C6A441F9743460078BAB0 /* CEPNBridgeManager.m in Sources */,
 				79B2B9051F979AEB00001726 /* RCTConvert+CEPNChatManager.m in Sources */,
 				79048A4F1F961A5B00A29059 /* main.m in Sources */,
-				799C6A321F973E090078BAB0 /* CEPNCtatViewController.m in Sources */,
+				799C6A321F973E090078BAB0 /* CEPNChatViewController.m in Sources */,
 				79B2B9001F97764800001726 /* CEPNAuthorizationViewController.m in Sources */,
 				798B5CC61F98E7C9007CB9B6 /* CEPNInviteUserViewController.m in Sources */,
 			);
@@ -514,15 +439,15 @@
 		};
 		79048A531F961A5B00A29059 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C9DA135AC2184720283D7227 /* Pods-ChatOnReact.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ChatOnReact/ChatOnReact.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ChatOnReact/Resources/General/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.PubNub.ChatOnReact;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pubnub.ChatOnReact;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -530,15 +455,15 @@
 		};
 		79048A541F961A5B00A29059 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 69E62F5D20420BF72301052C /* Pods-ChatOnReact.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ChatOnReact/ChatOnReact.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/ChatOnReact/Resources/General/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.PubNub.ChatOnReact;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pubnub.ChatOnReact;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

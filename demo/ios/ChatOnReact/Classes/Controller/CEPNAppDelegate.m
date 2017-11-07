@@ -1,6 +1,6 @@
 #import <UserNotifications/UserNotifications.h>
 #import <CENNotifications/CENNotifications.h>
-#import "CEPNCtatViewController.h"
+#import "CEPNChatViewController.h"
 #import "CEPNBridgeManager.h"
 #import "CEPNAppDelegate.h"
 #import "CEPNChatManager.h"
@@ -89,7 +89,7 @@
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController
   ontoPrimaryViewController:(UIViewController *)primaryViewController {
     if ([secondaryViewController isKindOfClass:[UINavigationController class]] &&
-        [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[CEPNCtatViewController class]]) {
+        [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[CEPNChatViewController class]]) {
         return YES;
     } else {
         return NO;

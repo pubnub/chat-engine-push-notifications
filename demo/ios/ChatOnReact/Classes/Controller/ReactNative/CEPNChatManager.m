@@ -12,7 +12,7 @@
 static NSString * const kCEPNAuthorizationController = @"CEPNAuthorizationViewController";
 static NSString * const kCEPNCreateChatViewController = @"CEPNCreateChatViewController";
 static NSString * const kCEPNChatInviteViewController = @"CEPNInviteUserViewController";
-static NSString * const kCEPNCtatViewController = @"CEPNCtatViewController";
+static NSString * const kCEPNChatViewController = @"CEPNChatViewController";
 
 
 /**
@@ -99,6 +99,10 @@ RCT_EXPORT_MODULE()
     }
 
     return self;
+}
+
++ (BOOL)requiresMainQueueSetup {
+    return YES;
 }
 
 - (dispatch_queue_t)methodQueue {
@@ -220,7 +224,7 @@ RCT_EXPORT_METHOD(showChat:(NSDictionary *)chat) {
 //            masterViewController.delegate = self;
 //            [chatsController performSegueWithIdentifier:@"showDetail" sender:chatsController];
 //        } else {
-//            UINavigationController *navigationController = (UINavigationController *)[CEPNChatManager viewControllerWithID:kCEPNCtatViewController];
+//            UINavigationController *navigationController = (UINavigationController *)[CEPNChatManager viewControllerWithID:kCEPNChatViewController];
 //            [detailViewController setViewControllers:navigationController.viewControllers];
 //        }
     });

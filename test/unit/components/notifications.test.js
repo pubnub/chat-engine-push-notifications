@@ -4,7 +4,7 @@ import { DeviceEventEmitter, NativeModules, Platform } from 'react-native';
 import { EventEmitter2 } from 'eventemitter2';
 import CENInvitationNotificationCategory from '../../../src/models/invitation-notification-category';
 import CENotifications from '../../../src/components/notifications';
-import TypeValidator from '../../../src/helpers/utils';
+import { TypeValidator } from '../../../src/helpers/utils';
 
 
 jest.mock('NativeModules', () => ({
@@ -13,6 +13,10 @@ jest.mock('NativeModules', () => ({
 
 /** @test {CENotifications} */
 describe('unittest::CENotifications', () => {
+    test('should be instance of EventEmitter2', () => {
+        expect(TypeValidator.isTypeOf(new CENotifications(), EventEmitter2)).toBeTruthy();
+    });
+
     describe('USER_INPUT', () => {
         test('should be getter', () => {
             expect(CENotifications.USER_INPUT).toBeDefined();
@@ -32,14 +36,9 @@ describe('unittest::CENotifications', () => {
 
         afterEach(() => NativeModules.CENNotifications.receiveMissedEvents.mockReset());
 
-        test('should be instance of EventEmitter2', () => {
-            expect(TypeValidator.isTypeOf(new CENotifications(), EventEmitter2)).toBeTruthy();
-        });
-
         test('should initialize with default values', () => {
             const notifications = new CENotifications();
             expect(notifications.destructing).toBeFalsy();
-            expect(notifications.senderID).toBeNull();
         });
 
         test('should request missed events', () => {
@@ -52,34 +51,6 @@ describe('unittest::CENotifications', () => {
             new CENotifications();
             expect(addListenerSpy).toHaveBeenCalled();
             addListenerSpy.mockRestore();
-        });
-
-        test('should throw TypeError when \'senderID\' is not type of String in Android environment', () => {
-            const originalPlatform = Platform.OS;
-            Platform.OS = 'android';
-            expect(() => new CENotifications(2010)).toThrowError(/Unexpected sender ID: empty or has unexpected data type \(string expected\)/);
-            Platform.OS = originalPlatform;
-        });
-
-        test('should throw TypeError when \'senderID\' is empty String in Android environment', () => {
-            const originalPlatform = Platform.OS;
-            Platform.OS = 'android';
-            expect(() => new CENotifications('')).toThrowError(/Unexpected sender ID: empty or has unexpected data type \(string expected\)/);
-            Platform.OS = originalPlatform;
-        });
-
-        test('should throw TypeError when \'senderID\' is undefined in Android environment', () => {
-            const originalPlatform = Platform.OS;
-            Platform.OS = 'android';
-            expect(() => new CENotifications(undefined)).toThrowError(/Unexpected sender ID: empty or has unexpected data type \(string expected\)/);
-            Platform.OS = originalPlatform;
-        });
-
-        test('should throw TypeError when \'senderID\' is undefined in Android environment', () => {
-            const originalPlatform = Platform.OS;
-            Platform.OS = 'android';
-            expect(() => new CENotifications(null)).toThrowError(/Unexpected sender ID: empty or has unexpected data type \(string expected\)/);
-            Platform.OS = originalPlatform;
         });
     });
 
@@ -119,10 +90,30 @@ describe('unittest::CENotifications', () => {
             expect(typeof notifications.applicationIconBadgeNumber === 'function').toBeTruthy();
         });
 
-        test('should call method on native module side', () => {
+        test('should call method on native module side for iOS environment', () => {
             const callback = number => expect(number).toBe(2010);
             notifications.applicationIconBadgeNumber(callback);
             expect(NativeModules.CENNotifications.applicationIconBadgeNumber).toHaveBeenCalledWith(callback);
+        });
+
+        test('should not call method on native module side for Android environment', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+            const callback = number => expect(number).toBe(2010);
+
+            notifications.applicationIconBadgeNumber(callback);
+            expect(NativeModules.CENNotifications.applicationIconBadgeNumber).not.toHaveBeenCalled();
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should not throw in non-test environment', () => {
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+
+            expect(() => notifications.applicationIconBadgeNumber(2010)).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
         });
 
         test('should throw TypeError when \'callback\' is not type of function', () => {
@@ -158,6 +149,15 @@ describe('unittest::CENotifications', () => {
             expect(NativeModules.CENNotifications.setApplicationIconBadgeNumber).toHaveBeenCalledWith(2010);
         });
 
+        test('should not throw in non-test environment', () => {
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+
+            expect(() => notifications.setApplicationIconBadgeNumber('')).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
+        });
+
         test('should throw TypeError when \'number\' is not type of Number', () => {
             expect(() => notifications.setApplicationIconBadgeNumber(''))
                 .toThrowError(/Unexpected icon badge number: undefined or has unexpected data type \(number expected\)/);
@@ -178,8 +178,10 @@ describe('unittest::CENotifications', () => {
         let notifications = null;
         beforeEach(() => {
             NativeModules.CENNotifications.requestPermissions = jest.fn();
-            notifications = new CENotifications('senderID');
+            notifications = new CENotifications();
         });
+
+        afterEach(() => notifications.destruct());
 
         test('should be function', () => {
             expect(typeof notifications.requestPermissions === 'function').toBeTruthy();
@@ -196,14 +198,16 @@ describe('unittest::CENotifications', () => {
             const permissions = { alert: true, sound: false, badge: true };
             const originalPlatform = Platform.OS;
             Platform.OS = 'android';
-            notifications.requestPermissions(permissions);
-            expect(NativeModules.CENNotifications.requestPermissions).toHaveBeenCalledWith(notifications.senderID);
+
+            notifications.requestPermissions(permissions).then(() => expect(true).toBeTruthy()).catch(() => expect(false).toBeTruthy());
+
             Platform.OS = originalPlatform;
         });
 
-        test('should throw TypeError when \'permissions\' is not type of Object', () => notifications.requestPermissions('')
-            .then(() => expect(false).toBeTruthy())
-            .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/)));
+        test('should throw TypeError when \'permissions\' is not type of Object', () =>
+            notifications.requestPermissions('')
+                .then(() => expect(false).toBeTruthy())
+                .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/)));
 
         test('should throw TypeError when \'permissions\' is Object with unknown keys', () => notifications.requestPermissions({ PubNub: 'is cool!' })
             .then(() => expect(false).toBeTruthy())
@@ -235,11 +239,170 @@ describe('unittest::CENotifications', () => {
         });
     });
 
+    describe('#registerNotificationChannels', () => {
+        NativeModules.CENNotifications.registerNotificationChannels = jest.fn();
+        let notifications = null;
+        beforeEach(() => {
+            notifications = new CENotifications();
+        });
+
+        afterEach(() => notifications.destruct());
+
+        test('should be function', () => {
+            expect(typeof notifications.registerNotificationChannels === 'function').toBeTruthy();
+        });
+
+        test('should not call method on native module side for iOS environment', () => {
+            notifications.registerNotificationChannels([{ PubNub: ['notification', 'channel'] }]);
+            expect(NativeModules.CENNotifications.registerNotificationChannels).not.toHaveBeenCalled();
+        });
+
+        test('should call method on native module side for Android environment', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+            const expected = [{ PubNub: ['notification', 'channel'] }];
+
+            notifications.registerNotificationChannels(expected);
+            expect(NativeModules.CENNotifications.registerNotificationChannels).toHaveBeenCalledWith(expected);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should not throw in non-test environment', () => {
+            const originalPlatform = Platform.OS;
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationChannels(2010)).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'channels\' is not type of Array', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationChannels(2010)).toThrowError(/Unexpected values type \(array expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'channels\' is \'undefined\'', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationChannels(undefined)).toThrowError(/Unexpected values type \(array expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'channels\' is Array of String', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationChannels(['PubNub', 'is', 'awesome!']))
+                .toThrowError(/Unexpected channels: has unexpected data type \(array expected\) with unknown value types \(object expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+    });
+
+    describe('#registerNotificationActions', () => {
+        NativeModules.CENNotifications.registerNotificationActions = jest.fn();
+        let notifications = null;
+        beforeEach(() => {
+            notifications = new CENotifications();
+        });
+
+        afterEach(() => notifications.destruct());
+
+        test('should be function', () => {
+            expect(typeof notifications.registerNotificationActions === 'function').toBeTruthy();
+        });
+
+        test('should not call method on native module side for iOS environment', () => {
+            notifications.registerNotificationActions({ Accept: 'AcceptView', Ignore: 'IgnoreView' });
+            expect(NativeModules.CENNotifications.registerNotificationActions).not.toHaveBeenCalled();
+        });
+
+        test('should call method on native module side for Android environment', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+            const expected = { Accept: 'AcceptActivity', Ignore: 'none' };
+
+            notifications.registerNotificationActions(expected);
+            expect(NativeModules.CENNotifications.registerNotificationActions).toHaveBeenCalledWith(expected);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should not throw in non-test environment', () => {
+            const originalPlatform = Platform.OS;
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationActions(2010)).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'actions\' is not type of Object', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationActions(2010))
+                .toThrowError(/Unexpected actions: empty or has unexpected data type \(array expected\) with unknown value types \(string expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'actions\' is \'undefined\'', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationActions(undefined))
+                .toThrowError(/Unexpected actions: empty or has unexpected data type \(array expected\) with unknown value types \(string expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+
+        test('should throw TypeError when \'actions\' is Object with Number values', () => {
+            const originalPlatform = Platform.OS;
+            Platform.OS = 'android';
+
+            expect(() => notifications.registerNotificationActions({ Accept: 2010, Ignore: 9 }))
+                .toThrowError(/Unexpected actions: empty or has unexpected data type \(array expected\) with unknown value types \(string expected\)/);
+
+            Platform.OS = originalPlatform;
+        });
+    });
+
+    describe('#deliverInitialNotification', () => {
+        NativeModules.CENNotifications.deliverInitialNotification = jest.fn();
+        let notifications = null;
+        beforeEach(() => {
+            notifications = new CENotifications();
+        });
+
+        test('should be function', () => {
+            expect(typeof notifications.deliverInitialNotification === 'function').toBeTruthy();
+        });
+
+        test('should call method on native module side', () => {
+            notifications.deliverInitialNotification();
+            expect(NativeModules.CENNotifications.deliverInitialNotification).toHaveBeenCalled();
+        });
+    });
+
     describe('deliveredNotifications', () => {
         NativeModules.CENNotifications.deliveredNotifications = jest.fn(callback => callback({ Pubnub: 'is awesome!' }));
         let notifications = null;
         beforeEach(() => {
-            notifications = new CENotifications('senderID');
+            notifications = new CENotifications();
         });
 
         test('should be function', () => {
@@ -250,6 +413,15 @@ describe('unittest::CENotifications', () => {
             const callback = deliveredNotifications => expect(deliveredNotifications).toEqual({ Pubnub: 'is awesome!' });
             notifications.deliveredNotifications(callback);
             expect(NativeModules.CENNotifications.deliveredNotifications).toHaveBeenCalledWith(callback);
+        });
+
+        test('should not throw in non-test environment', () => {
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+
+            expect(() => notifications.deliveredNotifications(2010)).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
         });
 
         test('should throw TypeError when \'callback\' is not type of function', () => {
@@ -265,69 +437,6 @@ describe('unittest::CENotifications', () => {
         test('should throw TypeError when \'callback\' is null', () => {
             expect(() => notifications.deliveredNotifications(null))
                 .toThrowError(/Unexpected callback: undefined or has unexpected data type \(function expected\)/);
-        });
-    });
-
-    describe('markNotificationAsSeen', () => {
-        NativeModules.CENNotifications.markNotificationAsSeen = jest.fn();
-        let notifications = null;
-        beforeEach(() => {
-            notifications = new CENotifications();
-        });
-
-        test('should be function', () => {
-            expect(typeof notifications.markNotificationAsSeen === 'function').toBeTruthy();
-        });
-
-        test('should call method on native module side', () => {
-            const notification = { PubNub: ['is', 'awesome!'] };
-            notifications.markNotificationAsSeen(notification);
-            expect(NativeModules.CENNotifications.markNotificationAsSeen).toHaveBeenCalledWith(notification);
-        });
-
-        test('should emit \'$.notifications.seen\' event', () => {
-            const emitSpy = jest.spyOn(notifications, 'emit');
-            const notification = { PubNub: ['is', 'awesome!'] };
-            notifications.markNotificationAsSeen(notification);
-            expect(emitSpy).toHaveBeenCalledWith('$.notifications.seen');
-        });
-
-        test('should throw TypeError when \'notification\' is not type of Object', () => {
-            expect(() => notifications.markNotificationAsSeen(2010))
-                .toThrowError(/Unexpected notification: empty or has unexpected data type \(object expected\)/);
-        });
-
-        test('should throw TypeError when \'notification\' is empty Object', () => {
-            expect(() => notifications.markNotificationAsSeen({}))
-                .toThrowError(/Unexpected notification: empty or has unexpected data type \(object expected\)/);
-        });
-
-        test('should throw TypeError when \'notification\' is undefined', () => {
-            expect(() => notifications.markNotificationAsSeen(undefined))
-                .toThrowError(/Unexpected notification: empty or has unexpected data type \(object expected\)/);
-        });
-    });
-
-    describe('markAllNotificationAsSeen', () => {
-        NativeModules.CENNotifications.markAllNotificationAsSeen = jest.fn();
-        let notifications = null;
-        beforeEach(() => {
-            notifications = new CENotifications();
-        });
-
-        test('should be function', () => {
-            expect(typeof notifications.markAllNotificationAsSeen === 'function').toBeTruthy();
-        });
-
-        test('should call method on native module side', () => {
-            notifications.markAllNotificationAsSeen();
-            expect(NativeModules.CENNotifications.markAllNotificationAsSeen).toHaveBeenCalled();
-        });
-
-        test('should emit \'$.notifications.seen\' event', () => {
-            const emitSpy = jest.spyOn(notifications, 'emit');
-            notifications.markAllNotificationAsSeen();
-            expect(emitSpy).toHaveBeenCalledWith('$.notifications.seen');
         });
     });
 
@@ -347,6 +456,15 @@ describe('unittest::CENotifications', () => {
             const callback = payload => payload;
             notifications.formatNotificationPayload(chanEnginePayload, callback);
             expect(NativeModules.CENNotifications.formatNotificationPayload).toHaveBeenCalledWith(chanEnginePayload, callback);
+        });
+
+        test('should not throw in non-test environment', () => {
+            const originalNodeEnv = process.env.NODE_ENV;
+            process.env.NODE_ENV = 'production';
+
+            expect(() => notifications.formatNotificationPayload(2010, () => {})).not.toThrowError();
+
+            process.env.NODE_ENV = originalNodeEnv;
         });
 
         test('should throw TypeError when \'payload\' is not type of Object', () => {
@@ -492,7 +610,7 @@ describe('unittest::CENotifications', () => {
         });
 
         test('should emit \'$.notifications.registration.fail\' event in response on \'CENRegistered\' event', () => {
-            const notification = { PubNub: ['is', 'awesome!'] };
+            const notification = { PubNub: ['is', 'awesome!'], action: {} };
             const emitSpy = jest.spyOn(notifications, 'emit');
             DeviceEventEmitter.emit('CENReceivedRemoteNotification', notification);
             expect(emitSpy).toHaveBeenCalledWith('$.notifications.received', notification);

@@ -1,4 +1,20 @@
-export default class TypeValidator {
+/**
+ * Wrap up exception raise code for easier debug.
+ * There is no troubles with throwing exceptions during tests, but when code is running within ReactNative container, thrown error real to unexpected
+ * behaviour w/o telling what exactly happened (end up with showing unrelated exception).
+ *
+ * @param error Reference on error object which should be thrown in _test_ environment and printed to console when running within ReactNative
+ * container.
+ */
+export function throwError(error) {
+    if (process.env.NODE_ENV === 'test') {
+        throw error;
+    } else {
+        console.error(error);
+    }
+}
+
+export class TypeValidator {
     /**
      * Run sequence of checks for passed `value` using function names of this class.
      *
@@ -17,22 +33,26 @@ export default class TypeValidator {
         }
 
         if (!Array.isArray(validations)) {
-            throw TypeError('Unexpected validations type (array expected).');
+            throwError(new TypeError('Unexpected validations type (array expected).'));
+            return false;
         }
 
         let pass = true;
-        validations.forEach((validation) => {
+        validations.every((validation) => {
             if (typeof validation === 'string') {
                 pass = pass && TypeValidator[validation](value);
             } else if (Array.isArray(validation)) {
                 if (typeof validation[0] === 'string') {
                     pass = pass && TypeValidator[validation[0]](value, ...validation.slice(1));
                 } else {
-                    throw TypeError('Unexpected validation function type (string expected).');
+                    throwError(new TypeError('Unexpected validation function type (string expected).'));
+                    pass = false;
                 }
             } else {
-                throw TypeError('Unexpected validation operation type (should be string or array).');
+                throwError(new TypeError('Unexpected validation operation type (should be string or array).'));
+                pass = false;
             }
+            return pass;
         });
         return pass;
     }
@@ -106,7 +126,7 @@ export default class TypeValidator {
             valueCheckCallback = valueCheckCallback || (() => true);
             return values.every(value => TypeValidator.isTypeOf(value, type) && valueCheckCallback(value));
         }
-        throw TypeError('Unexpected values type (array expected).');
+        throwError(new TypeError('Unexpected values type (array expected).'));
     }
 
     /**
@@ -134,7 +154,7 @@ export default class TypeValidator {
             }
             return value instanceof type;
         }
-        throw TypeError('Unexpected type data type (string or Class expected).');
+        throwError(new TypeError('Unexpected type data type (string or Class expected).'));
     }
 
     /**
@@ -163,9 +183,10 @@ export default class TypeValidator {
             return TypeValidator.isDefined(value) && variants.includes(value);
         }
         if (!TypeValidator.isTypeOf(value, String)) {
-            throw TypeError('Unexpected value type (string expected).');
+            throwError(new TypeError('Unexpected value type (string expected).'));
+        } else {
+            throwError(new TypeError('Unexpected variants type (array expected) or keys entries has unexpected values.'));
         }
-        throw TypeError('Unexpected variants type (array expected) or keys entries has unexpected values.');
     }
 
     /**
@@ -183,9 +204,10 @@ export default class TypeValidator {
             return Object.keys(value).every(key => TypeValidator.isOneOf(key, keys));
         }
         if (!TypeValidator.isArrayOf(keys, String)) {
-            throw TypeError('Unexpected keys type (array expected) or keys entries has unexpected values.');
+            throwError(new TypeError('Unexpected keys type (array expected) or keys entries has unexpected values.'));
+        } else {
+            throwError(new TypeError('Unexpected value type (object expected).'));
         }
-        throw TypeError('Unexpected value type (object expected).');
     }
 
     /**
@@ -201,7 +223,7 @@ export default class TypeValidator {
         if (TypeValidator.isObject(value)) {
             return TypeValidator.isArrayOf(Object.values(value), type);
         }
-        throw TypeError('Unexpected value type (object expected).');
+        throwError(new TypeError('Unexpected value type (object expected).'));
     }
 
     /**

@@ -5,7 +5,7 @@
 import { Platform } from 'react-native';
 import CENotificationFormatter from '../helpers/formatter';
 import CENotifications from './notifications';
-import TypeValidator from '../helpers/utils';
+import { TypeValidator, throwError } from '../helpers/utils';
 
 /**
  * Stores reference on instances for which `destruct` function has been used. This function should be used when current used is leaving (switching
@@ -60,14 +60,14 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @example <caption>Simple setup</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
      * @example <caption>Setup with notification formatter</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.protoPlugin('Me', plugin({
+     * ChatEngine.proto('Me', plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true },
      *     formatter: (payload) => {
@@ -91,7 +91,10 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * }));
      */
     constructor(configuration) {
-        CENotificationsExtension.validateConfiguration(configuration);
+        if (!CENotificationsExtension.validateConfiguration(configuration)) {
+            super(configuration);
+            return;
+        }
         CENotificationsExtension.applyDefaultConfigurationValues(configuration);
         super(configuration);
         /**
@@ -133,12 +136,11 @@ export class CENotificationsExtension extends ChatEnginePlugin {
          * @type {CENotifications}
          * @private
          */
-        this.notifications = new CENotifications(configuration.senderID);
-        this.notifications._markNotificationAsSeen = this.notifications.markNotificationAsSeen;
-        this.notifications.markNotificationAsSeen = (notification) => {
-            this.notifications._markNotificationAsSeen(notification);
-            this.markNotificationAsSeen(notification);
-        };
+        this.notifications = new CENotifications();
+        /** @public */
+        this.notifications.markNotificationAsSeen = this.markNotificationAsSeen.bind(this);
+        /** @public */
+        this.notifications.markAllNotificationAsSeen = this.markAllNotificationAsSeen.bind(this);
         this.notifications._destruct = this.notifications.destruct;
         this.notifications.destruct = () => {
             this.notifications._destruct();
@@ -194,7 +196,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
 
         // Disable push notifications for all previously enabled chats.
         Object.keys(this.chatsState).forEach((channel) => {
-            if (this.chatsState[channel].states.includes('ignored')) {
+            if (!TypeValidator.isDefined(this.chatsState[channel].states) || this.chatsState[channel].states.includes('ignored')) {
                 delete this.chatsState[channel];
             } else {
                 const chat = this.ChatEngine.chats[channel];
@@ -222,8 +224,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     }
 
     /**
-     * Replacement for function which is used to mark passed `notification` as seen on all devices which is registered for push notification for
-     * current user.
+     * Mark passed `notification` as seen on all devices which is registered for push notification for current user.
      *
      * @param {CENNotificationPayload} notification - Reference on notification which should be marked by native module as 'seen'.
      * @private
@@ -231,13 +232,30 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     markNotificationAsSeen(notification) {
         if (!TypeValidator.sequence(notification, [['isTypeOf', Object], 'notEmpty',
             ['hasKnownKeys', ['notification', 'foreground', 'userInteraction', 'action', 'completion']]])) {
-            throw new TypeError('Unexpected notification: empty or has unexpected data type (object expected) with unknown keys.');
+            throwError(new TypeError('Unexpected notification: empty or has unexpected data type (object expected) with unknown keys.'));
+            return;
         }
         if (!TypeValidator.sequence(notification.notification, [['isTypeOf', Object], 'notEmpty'])) {
-            throw new TypeError('Unexpected notification payload: empty or has unexpected data type (object expected).');
+            throwError(new TypeError('Unexpected notification payload: empty or has unexpected data type (object expected).'));
+            return;
         }
-        const { ceid } = notification.notification;
-        this.ChatEngine.me.direct.emit('$.notifications.seen', { ceid });
+
+        if (TypeValidator.isDefined(notification.notification.cepayload) && (notification.userInteraction || notification.foreground)) {
+            const { ceid, event } = notification.notification.cepayload;
+            if (TypeValidator.isDefined(ceid) && event !== '$.notifications.seen') {
+                this.parent.notifications.emit('$.notifications.seen');
+                this.ChatEngine.me.direct.emit('$.notifications.seen', { ceid });
+            }
+        }
+    }
+
+    /**
+     * Mark all notifications as seen on all devices which is registered for push notifications for current user.
+     * @private
+     */
+    markAllNotificationAsSeen() {
+        this.parent.notifications.emit('$.notifications.seen');
+        this.ChatEngine.me.direct.emit('$.notifications.seen', { ceid: 'all' });
     }
 
     /**
@@ -342,7 +360,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
 
         // Mark notification as seen event.
         if (event === '$.notifications.seen') {
-            formattedPayload = CENotificationFormatter.seenNotification(payload);
+            formattedPayload = CENotificationFormatter.seenNotification(payload, this.configuration.platforms);
             next(null, CENotificationFormatter.normalized(payload, formattedPayload));
             return;
         }
@@ -381,6 +399,14 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @private
      */
     onDeviceRegister(notificationToken) {
+        // Re-enable notifications in case if they has been enabled earlier during application operation time.
+        if (TypeValidator.isDefined(this.notificationToken) && this.notificationToken !== notificationToken) {
+            Object.keys(this.chatsState).forEach((channel) => {
+                if (this.chatsState[channel].states.includes('enabled') || this.chatsState[channel].states.includes('enabling')) {
+                    this.chatsState[channel].states = ['enable'];
+                }
+            });
+        }
         this.notificationToken = notificationToken;
         this.startDelayedNotificationStateChange();
     }
@@ -511,28 +537,34 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * Validate notification category action options.
      *
      * @param {CEConfiguration} configuration - reference on configuration object which should be completed with default values.
+     * @return {Boolean} `true` in case if passed object correspond to {@link CEConfiguration} object representation.
      *
      * @throws {TypeError} in case if one of required parameters is empty or any passed parameters has unexpected data type.
      */
     static validateConfiguration(configuration) {
         if (!TypeValidator.sequence(configuration, [['isTypeOf', Object], 'notEmpty'])) {
-            throw new TypeError('Unexpected configuration: empty or has unexpected data type (object expected).');
+            throwError(new TypeError('Unexpected configuration: empty or has unexpected data type (object expected).'));
+            return false;
         } else if (!TypeValidator.sequence(configuration.events, [['isArrayOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected events: empty or has unexpected data type (array expected) with unexpected data entry type (string ' +
-                'expected).');
+            throwError(new TypeError('Unexpected events: empty or has unexpected data type (array expected) with unexpected data entry type (string ' +
+                'expected).'));
+            return false;
         } else if (TypeValidator.isDefined(configuration.ignoredChats) && !TypeValidator.isArrayOf(configuration.ignoredChats, String)) {
-            throw new TypeError('Unexpected ignored chats: unexpected entries data type (string expected).');
+            throwError(new TypeError('Unexpected ignored chats: unexpected entries data type (string expected).'));
+            return false;
         } else if (!TypeValidator.sequence(configuration.platforms, [['isTypeOf', Object], 'notEmpty', ['hasKnownKeys', ['ios', 'android']],
             ['hasValuesOf', Boolean]])) {
-            throw new TypeError('Unexpected platforms: empty or has unexpected type (string expected) with unknown keys and unexpected data entry ' +
-                'type (boolean expected).');
-        } else if (Platform.OS === 'android' && !TypeValidator.sequence(configuration.senderID, [['isTypeOf', String], 'notEmpty'])) {
-            throw new TypeError('Unexpected sender ID: empty or has unexpected data type (string expected).');
+            throwError(new TypeError('Unexpected platforms: empty or has unexpected type (string expected) with unknown keys and unexpected data entry ' +
+                'type (boolean expected).'));
+            return false;
         } else if (TypeValidator.isDefined(configuration.markAsSeen) && !TypeValidator.isTypeOf(configuration.markAsSeen, Boolean)) {
-            throw new TypeError('Unexpected mark as seen: has unexpected data type (boolean expected).');
+            throwError(new TypeError('Unexpected mark as seen: has unexpected data type (boolean expected).'));
+            return false;
         } else if (TypeValidator.isDefined(configuration.formatter) && !TypeValidator.isTypeOf(configuration.formatter, 'function')) {
-            throw new TypeError('Unexpected formatter: has unexpected data type (function expected).');
+            throwError(new TypeError('Unexpected formatter: has unexpected data type (function expected).'));
+            return false;
         }
+        return true;
     }
 
     /**
@@ -541,13 +573,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @return {Boolean} `true` in case if chat name is inside of `ignoredChats` list.
      */
     shouldIgnoreChat(chat) {
-        let shouldIgnore = false;
-        this.configuration.ignoredChats.forEach((chatChannelName) => {
-            if (!shouldIgnore && chat.channel.endsWith(chatChannelName)) {
-                shouldIgnore = true;
-            }
-        });
-        return shouldIgnore;
+        return !this.configuration.ignoredChats.every(chatChannelName => !chat.channel.endsWith(chatChannelName));
     }
 
     /**

@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
 /* global test, expect */
-import TypeValidator from '../../src/helpers/utils';
+import { TypeValidator } from '../../src/helpers/utils';
 import { plugin } from '../../src/plugin';
 
 

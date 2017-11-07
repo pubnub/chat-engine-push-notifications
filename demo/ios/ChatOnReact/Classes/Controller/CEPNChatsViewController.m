@@ -1,5 +1,5 @@
 #import "CEPNChatsViewController.h"
-#import "CEPNCtatViewController.h"
+#import "CEPNChatViewController.h"
 #import "CEPNBridgeManager.h"
 #import <React/RCTLog.h>
 
@@ -42,7 +42,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
-        CEPNCtatViewController *controller = (CEPNCtatViewController *)[[segue destinationViewController] topViewController];
+        CEPNChatViewController *controller = (CEPNChatViewController *)[[segue destinationViewController] topViewController];
         controller.chat = self.selectedChat;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
     }
