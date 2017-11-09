@@ -6,12 +6,12 @@
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
-    "chat-engine": "0.7.x",
+    "chat-engine": "0.8.x",
     "chat-engine-notifications": "^1.0.8",
-    "chat-engine-react-native": "0.0.8",
+    "chat-engine-react-native": "0.0.9",
     "chat-engine-typing-indicator": "0.0.8",
-    "react": "^16.0.0-beta.5",
-    "react-native": "^0.49.5",
+    "react": "16.x.x",
+    "react-native": "0.50.x",
     "react-native-elements": "^0.18.2",
     "react-native-swipeable": "^0.6.0",
     "react-native-vector-icons": "^4.4.2"

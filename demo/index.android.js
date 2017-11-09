@@ -15,7 +15,7 @@ console.disableYellowBox = true;
 const ChatEngine = ChatEngineCore.create({
     publishKey: '<publish-key>',
     subscribeKey: '<subscribe-key>'
-}, { endpoint: 'http://<server.js running machine IP address>:3000/insecure' });
+});
 
 // Adding important proto plugins.
 ChatEngine.proto('Me', plugin({
