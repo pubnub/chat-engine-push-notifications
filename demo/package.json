@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "chat-engine": "0.8.x",
-    "chat-engine-notifications": "^1.0.8",
+    "chat-engine-notifications": "^1.0.9",
     "chat-engine-react-native": "0.0.9",
     "chat-engine-typing-indicator": "0.0.8",
     "react": "16.x.x",
