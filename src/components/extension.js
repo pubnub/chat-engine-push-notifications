@@ -573,6 +573,9 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @return {Boolean} `true` in case if chat name is inside of `ignoredChats` list.
      */
     shouldIgnoreChat(chat) {
+        if (chat.group === 'system') {
+            return !chat.channel.endsWith('#write.#direct');
+        }
         return !this.configuration.ignoredChats.every(chatChannelName => !chat.channel.endsWith(chatChannelName));
     }
 

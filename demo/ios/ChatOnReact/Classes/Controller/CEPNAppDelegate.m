@@ -23,9 +23,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
+    // Uncomment to work with React Native bundled JS files.
+    // NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+    NSURL *bundleURL = [NSURL URLWithString:@"http://<react-native server IP>:8081/index.ios.bundle?platform=ios"];
     [CENNotifications application:application didFinishLaunchingWithOptions:launchOptions];
-    [CEPNBridgeManager setupWithJSBundleURL:[NSURL URLWithString:@"http://<react-native server IP>:8081/index.ios.bundle?platform=ios"]
-                              launchOptions:launchOptions];
+    [CEPNBridgeManager setupWithJSBundleURL:bundleURL launchOptions:launchOptions];
     [CEPNChatManager prepare];
 
     if (@available(iOS 10.0, *)) {

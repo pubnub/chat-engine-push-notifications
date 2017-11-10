@@ -1,12 +1,9 @@
 /* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
 /* global test, expect */
-import { networkInterfaces } from 'os';
 import ChatEngineCore from 'chat-engine';
 import { plugin } from '../../src/plugin';
 
-// Retrieve reference on currently used network interface. Address is the same as used to start ChatEngine server.
-const networkInterface = [].concat(...Object.values(networkInterfaces())).filter(details => details.family === 'IPv4' && !details.internal).pop();
-
+// noinspection ES6ModulesDependencies,NodeModulesDependencies
 jest.mock('NativeModules', () => ({
     CENNotifications: {
         receiveMissedEvents: jest.fn(),
@@ -18,10 +15,7 @@ describe('integration::ChatEngineCore', () => {
     let chatEngine;
 
     beforeEach(() => {
-        chatEngine = ChatEngineCore.create(
-            { publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY },
-            { endpoint: `http://${networkInterface.address}:3000/insecure`, throwErrors: true }
-        );
+        chatEngine = ChatEngineCore.create({ publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY });
     });
 
     test('should provide interface for proto plugins', () => {
@@ -40,10 +34,7 @@ describe('integration::ChatEngineNotifications', () => {
     let chatEngine;
 
     beforeEach(() => {
-        chatEngine = ChatEngineCore.create(
-            { publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY },
-            { endpoint: `http://${networkInterface.address}:3000/insecure`, throwErrors: true }
-        );
+        chatEngine = ChatEngineCore.create({ publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY });
     });
 
     test('should add \'notifications\' property to Me', (done) => {
@@ -68,6 +59,7 @@ describe('integration::ChatEngineNotifications', () => {
 
     test('should use user-provided formatter with no notification appending ({} returned from formatter)', (done) => {
         const formatter = () => ({});
+        let messageReceived = false;
         chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
@@ -76,6 +68,7 @@ describe('integration::ChatEngineNotifications', () => {
         }));
         chatEngine.on('$.ready', () => {
             const messageHandler = (message) => {
+                messageReceived = true;
                 chatEngine.me.direct.off('message', messageHandler);
                 expect(message.pn_apns).not.toBeDefined();
                 expect(message.pn_gcm).not.toBeDefined();
@@ -86,14 +79,26 @@ describe('integration::ChatEngineNotifications', () => {
                 chatEngine.me.direct.off('$.connected', connectionHandler);
                 chatEngine.me.direct.on('message', messageHandler);
                 chatEngine.me.direct.emit('message', { message: 'For chat' });
+                let retryInterval = setInterval(() => {
+                    if (!messageReceived) {
+                        chatEngine.me.direct.emit('message', { message: 'For chat' });
+                    } else {
+                        clearInterval(retryInterval);
+                    }
+                }, 100);
             };
-            chatEngine.me.direct.on('$.connected', connectionHandler);
+            if (!chatEngine.me.direct.connected) {
+                chatEngine.me.direct.on('$.connected', connectionHandler);
+            } else {
+                connectionHandler();
+            }
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
     test('should use user-provided formatter to append push notification to published message', (done) => {
         const formatter = () => ({ apns: { aps: { alert: 'Title from formatted function #1' } } });
+        let messageReceived = false;
         chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
@@ -102,6 +107,7 @@ describe('integration::ChatEngineNotifications', () => {
         }));
         chatEngine.on('$.ready', () => {
             const messageHandler = (message) => {
+                messageReceived = true;
                 chatEngine.me.direct.off('message', messageHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.aps.alert).toEqual(formatter().apns.aps.alert);
@@ -118,17 +124,30 @@ describe('integration::ChatEngineNotifications', () => {
                 chatEngine.me.direct.off('$.connected', connectionHandler);
                 chatEngine.me.direct.on('message', messageHandler);
                 chatEngine.me.direct.emit('message', { message: 'For chat' });
+                let retryInterval = setInterval(() => {
+                    if (!messageReceived) {
+                        chatEngine.me.direct.emit('message', { message: 'For chat' });
+                    } else {
+                        clearInterval(retryInterval);
+                    }
+                }, 500);
             };
-            chatEngine.me.direct.on('$.connected', connectionHandler);
+            if (!chatEngine.me.direct.connected) {
+                chatEngine.me.direct.on('$.connected', connectionHandler);
+            } else {
+                connectionHandler();
+            }
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
     test('should use default formatter for $.invite', (done) => {
         chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        let inviteReceived = false;
         chatEngine.on('$.ready', () => {
             const chat = new chatEngine.Chat('secret-meeting');
             const invitationHandler = (message) => {
+                inviteReceived = true;
                 chatEngine.me.direct.off('$.invite', invitationHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.aps.category).toBeDefined();
@@ -142,6 +161,13 @@ describe('integration::ChatEngineNotifications', () => {
                 chat.off('$.connected', connectionHandler);
                 chatEngine.me.direct.on('$.invite', invitationHandler);
                 chat.invite(chatEngine.me);
+                let retryInterval = setInterval(() => {
+                    if (!inviteReceived) {
+                        chat.invite(chatEngine.me);
+                    } else {
+                        clearInterval(retryInterval);
+                    }
+                }, 500);
             };
             chat.on('$.connected', connectionHandler);
         });
@@ -150,9 +176,11 @@ describe('integration::ChatEngineNotifications', () => {
 
     test('should send $.notifications.seen event', (done) => {
         const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+        let messageReceived = false;
         chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         chatEngine.on('$.ready', () => {
             const messageHandler = (message) => {
+                messageReceived = true;
                 chatEngine.me.direct.off('$.notifications.seen', messageHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.cepayload).toBeDefined();
@@ -167,6 +195,13 @@ describe('integration::ChatEngineNotifications', () => {
                 chatEngine.me.direct.off('$.connected', connectionHandler);
                 chatEngine.me.direct.on('$.notifications.seen', messageHandler);
                 chatEngine.me.notifications.markNotificationAsSeen(notification);
+                let retryInterval = setInterval(() => {
+                    if (!messageReceived) {
+                        chatEngine.me.notifications.markNotificationAsSeen(notification);
+                    } else {
+                        clearInterval(retryInterval);
+                    }
+                }, 500);
             };
             if (!chatEngine.me.direct.connected) {
                 chatEngine.me.direct.on('$.connected', connectionHandler);

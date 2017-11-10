@@ -17,7 +17,11 @@ jest.mock('NativeModules', () => ({
 
 /** @test {CENotificationsExtension} */
 describe('unittest::CENotificationsExtension', () => {
-    const minimumConfiguration = { events: ['$.invite', 'message'], platforms: { ios: true, android: true } };
+    const minimumConfiguration = {
+        events: ['$.invite', 'message'],
+        platforms: { ios: true, android: true },
+        ignoredChats: ['IgnoredChat1', 'IgnoredChat2']
+    };
     const originalPlatform = Platform.OS;
     let extension;
     let configuration;
@@ -1209,6 +1213,38 @@ describe('unittest::CENotificationsExtension', () => {
             CENotificationsExtension.applyDefaultConfigurationValues(testedConfiguration);
             testedConfiguration.events.pop();
             expect(testedConfiguration.events).toHaveLength(0);
+        });
+    });
+
+    describe('#shouldIgnoreChat', () => {
+        afterEach(() => extension.notifications.destruct());
+
+        test('should be function', () => {
+            expect(typeof extension.shouldIgnoreChat === 'function').toBeTruthy();
+        });
+
+        test('should process \'#write.#direct\' chat from \'system\' group', () => {
+            const chat = { channel: `chat-engine#user#${extension.ChatEngine.me.uuid}#write.#direct`, group: 'system' };
+
+            expect(extension.shouldIgnoreChat(chat)).toBeFalsy();
+        });
+
+        test('should ignore other chats from \'system\' group', () => {
+            const chat = { channel: `chat-engine#user#${extension.ChatEngine.me.uuid}#me.#sync`, group: 'system' };
+
+            expect(extension.shouldIgnoreChat(chat)).toBeTruthy();
+        });
+
+        test('should process chats not from \'ignoredChats\' list', () => {
+            const chat = { channel: 'chat-engine#chat#public.#test1', group: 'custom' };
+
+            expect(extension.shouldIgnoreChat(chat)).toBeFalsy();
+        });
+
+        test('should ignore chats from \'ignoredChats\' list', () => {
+            const chat = { channel: 'chat-engine#chat#public.#IgnoredChat1', group: 'custom' };
+
+            expect(extension.shouldIgnoreChat(chat)).toBeTruthy();
         });
     });
 });

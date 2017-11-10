@@ -26,7 +26,7 @@ export default class CEPNChatsListView extends React.Component {
      */
     constructor(properties) {
         super(properties);
-        this._ignoredChats = ['chat-engine', '#read.#feed', '#write.#direct', '#Main', '#Support', '#Docs', '#Foolery'];
+        this._ignoredChats = ['#Main', '#Support', '#Docs', '#Foolery'];
         this._chatsList = [];
         this.state = {
             rightActionActivated: false,
@@ -333,14 +333,10 @@ export default class CEPNChatsListView extends React.Component {
      * @return {Boolean} `true` in case if chat has been found in list of ignored chats.
      */
     isIgnoredChat(chat) {
-        let isIgnoredChat = false;
-        this._ignoredChats.forEach(chatName => {
-            if (!isIgnoredChat && chat.channel.endsWith(chatName)) {
-                isIgnoredChat = true;
-            }
-        });
-
-        return isIgnoredChat;
+        if (chat.group === 'system') {
+            return true;
+        }
+        return !this._ignoredChats.every(chatChannelName => !chat.channel.endsWith(chatChannelName));
     }
 }
 

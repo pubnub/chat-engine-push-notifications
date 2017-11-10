@@ -51,12 +51,11 @@
     "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
   },
   "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "scripts": {
-    "test": "jest --ci",
-    "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=/test/unit/",
-    "integration_test": "jest --forceExit --config=test/integration/jest-config.json --testPathPattern=/test/integration/",
-    "full_test": "jest --forceExit"
+    "test": "jest --ci --forceExit",
+    "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=test/unit/",
+    "integration_test": "jest --ci --forceExit --config=test/integration/jest-config.json --testPathPattern=test/integration/"
   },
   "jest": {
     "collectCoverage": true,
@@ -69,10 +68,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 90,
-        "functions": 90,
-        "lines": 90,
-        "statements": 90
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
       }
     },
     "coveragePathIgnorePatterns": [

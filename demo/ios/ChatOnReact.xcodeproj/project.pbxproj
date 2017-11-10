@@ -109,7 +109,7 @@
 		799C6A271F973E090078BAB0 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				799C6A411F9743220078BAB0 /* ReactNative */,
+				799C6A411F9743220078BAB0 /* React Native */,
 				799C6A281F973E090078BAB0 /* CEPNAppDelegate.h */,
 				799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */,
 				799C6A2A1F973E090078BAB0 /* CEPNChatsViewController.h */,
@@ -176,7 +176,7 @@
 			path = Interface;
 			sourceTree = "<group>";
 		};
-		799C6A411F9743220078BAB0 /* ReactNative */ = {
+		799C6A411F9743220078BAB0 /* React Native */ = {
 			isa = PBXGroup;
 			children = (
 				799C6A421F9743460078BAB0 /* CEPNBridgeManager.h */,
@@ -184,7 +184,7 @@
 				79B2B8FB1F976FD600001726 /* CEPNChatManager.h */,
 				79B2B8FC1F976FD600001726 /* CEPNChatManager.m */,
 			);
-			path = ReactNative;
+			path = "React Native";
 			sourceTree = "<group>";
 		};
 		79B2B9011F979AB700001726 /* Misc */ = {

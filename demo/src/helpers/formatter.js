@@ -1,5 +1,4 @@
 import { NativeModules } from 'react-native';
-import { TypeValidator } from '../../../src/helpers/utils';
 
 const { CENNotifications } = NativeModules;
 
@@ -36,7 +35,7 @@ export default function formatter(eventPayload) {
             notificationPayload.aps = { alert: { title: notificationTitle, body: notificationBody } };
         } else {
             notificationPayload.data = { contentTitle: notificationTitle, contentText: notificationBody, ticker: notificationTicker };
-            if (TypeValidator.isDefined(notificationCategory)) {
+            if (notificationCategory !== null && notificationCategory !== undefined) {
                 notificationPayload.data.category = notificationCategory;
             }
             if (eventPayload.event === '$.invite') {

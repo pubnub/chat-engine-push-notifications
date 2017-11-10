@@ -133,6 +133,10 @@ RCT_EXPORT_MODULE()
 
 #if !TARGET_OS_TV && !TARGET_OS_OSX && !TARGET_OS_WATCH
 
++ (BOOL)requiresMainQueueSetup {
+    return YES;
+}
+
 #pragma mark - Initialization and Configuration
 
 - (instancetype)init {
