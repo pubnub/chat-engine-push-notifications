@@ -11,6 +11,7 @@
     "babel-plugin-transform-builtin-extend": "1.x.x",
     "babel-preset-env": "1.x.x",
     "babel-preset-react-native": "4.x.x",
+    "babel-register": "^6.26.0",
     "esdoc": "^1.0.4",
     "esdoc-node": "^1.0.3",
     "esdoc-standard-plugin": "1.x.x",
