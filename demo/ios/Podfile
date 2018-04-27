@@ -3,7 +3,7 @@ platform :ios, '10.0'
 target 'ChatOnReact' do
     pod 'React', :path => '../node_modules/react-native', :subspecs => [
       'Core',
-      'BatchedBridge',
+      'CxxBridge',
       'RCTText',
       'RCTImage',
       'RCTAnimation',

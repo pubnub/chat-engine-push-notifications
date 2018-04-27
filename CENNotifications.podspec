@@ -25,6 +25,7 @@ Pod::Spec.new do |spec|
   spec.preserve_paths = "package.json", "LICENSE"
   spec.source_files = "Libraries/ios/**/*.{h,m}"
   spec.header_dir   = "CENNotifications"
+  spec.dependency "React"
 
   spec.license = { 
       :type => package["license"], 

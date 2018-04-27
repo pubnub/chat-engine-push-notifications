@@ -1,4 +1,3 @@
-import React from 'react';
 import { AsyncStorage, NativeModules, AppRegistry } from 'react-native';
 import CEPNInviteUserView from './src/screens/invite-user';
 import CEPNCreateChatView from './src/screens/create-chat';
@@ -25,7 +24,7 @@ ChatEngine.proto('Me', plugin({
     markAsSeen: true,
     formatter
 }));
-ChatEngine.proto('Chat', TypingIndicator({timeout: 3000}));
+ChatEngine.proto('Chat', TypingIndicator({ timeout: 3000 }));
 
 CEPNAuthorizeUserView.setChatEngine(ChatEngine);
 CEPNInviteUserView.setChatEngine(ChatEngine);
@@ -33,7 +32,7 @@ CEPNCreateChatView.setChatEngine(ChatEngine);
 CEPNChatsListView.setChatEngine(ChatEngine);
 CEPNChatView.setChatEngine(ChatEngine);
 
-AsyncStorage.multiGet(['@ChatOnReact:user']).then(userData => {
+AsyncStorage.multiGet(['@ChatOnReact:user']).then((userData) => {
     const userName = userData[0][1];
     if (userName === null || userName === undefined) {
         NativeModules.CEPNChatManager.showAuthorizationView();

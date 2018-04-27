@@ -62,6 +62,6 @@ typings/
 
 # CocoaPods
 ChatOnReact.xcworkspace
-*.xcuserdatad
+*.xcuserdata
 Podfile.lock
 Pods
