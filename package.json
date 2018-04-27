@@ -4,32 +4,33 @@
   },
   "dependencies": {
     "eventemitter2": "^4.1.2",
-    "uuid": "3.x.x"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-builtin-extend": "1.x.x",
     "babel-preset-env": "1.x.x",
     "babel-preset-react-native": "4.x.x",
-    "esdoc": "1.x.x",
-    "esdoc-node": "1.x.x",
+    "babel-register": "^6.26.0",
+    "esdoc": "^1.0.4",
+    "esdoc-node": "^1.0.3",
     "esdoc-standard-plugin": "1.x.x",
-    "eslint": "4.x.x",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb": "16.x.x",
-    "eslint-plugin-import": "2.x.x",
-    "eslint-plugin-jsx-a11y": "6.x.x",
-    "eslint-plugin-react": "7.x.x",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
     "gulp": "3.x.x",
-    "gulp-eslint": "4.x.x",
-    "gulp-shell": "0.6.x",
+    "gulp-eslint": "^4.0.2",
+    "gulp-shell": "^0.6.5",
     "jest": "21.x.x",
     "jest-cli": "21.x.x",
-    "regenerator-runtime": "0.11.x",
-    "run-sequence": "^2.2.0"
+    "regenerator-runtime": "^0.11.1",
+    "run-sequence": "^2.2.1"
   },
   "peerDependencies": {
-    "chat-engine": "0.8.x",
-    "react-native": "0.50.x",
+    "chat-engine": "0.9.x",
+    "react-native": "0.55.x",
     "react": "16.x.x"
   },
   "description": "Open Chat Framework Push Notifications support plugin",
@@ -51,7 +52,7 @@
     "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
   },
   "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "scripts": {
     "test": "jest --ci --forceExit",
     "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=test/unit/",
