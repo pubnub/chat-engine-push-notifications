@@ -1,0 +1,17 @@
+platform :ios, '10.0'
+
+target 'ChatOnReact' do
+    pod 'React', :path => '../node_modules/react-native', :subspecs => [
+      'Core',
+      'BatchedBridge',
+      'RCTText',
+      'RCTImage',
+      'RCTAnimation',
+      'RCTLinkingIOS',
+      'DevSupport',
+      'RCTNetwork',
+      'RCTWebSocket'
+    ]
+    pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
+	pod 'CENNotifications', :path => '../node_modules/chat-engine-notifications'
+end

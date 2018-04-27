@@ -57,3 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
+# IDE
+.idea
+
+# CocoaPods
+ChatOnReact.xcworkspace
+*.xcuserdatad
+Podfile.lock
+Pods

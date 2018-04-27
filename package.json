@@ -1,0 +1,97 @@
+{
+  "author": {
+    "name": "Serhii Mamontov <sergey@pubnub.com>"
+  },
+  "dependencies": {
+    "eventemitter2": "^4.1.2",
+    "uuid": "3.x.x"
+  },
+  "devDependencies": {
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-transform-builtin-extend": "1.x.x",
+    "babel-preset-env": "1.x.x",
+    "babel-preset-react-native": "4.x.x",
+    "esdoc": "1.x.x",
+    "esdoc-node": "1.x.x",
+    "esdoc-standard-plugin": "1.x.x",
+    "eslint": "4.x.x",
+    "eslint-config-airbnb": "16.x.x",
+    "eslint-plugin-import": "2.x.x",
+    "eslint-plugin-jsx-a11y": "6.x.x",
+    "eslint-plugin-react": "7.x.x",
+    "gulp": "3.x.x",
+    "gulp-eslint": "4.x.x",
+    "gulp-shell": "0.6.x",
+    "jest": "21.x.x",
+    "jest-cli": "21.x.x",
+    "regenerator-runtime": "0.11.x",
+    "run-sequence": "^2.2.0"
+  },
+  "peerDependencies": {
+    "chat-engine": "0.8.x",
+    "react-native": "0.50.x",
+    "react": "16.x.x"
+  },
+  "description": "Open Chat Framework Push Notifications support plugin",
+  "keywords": [
+    "pubnub",
+    "chat",
+    "sdk",
+    "realtime",
+    "notifications"
+  ],
+  "license": "MIT",
+  "main": "src/plugin.js",
+  "name": "chat-engine-notifications",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pubnub/chat-engine-push-notifications.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
+  },
+  "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
+  "version": "1.0.10",
+  "scripts": {
+    "test": "jest --ci --forceExit",
+    "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=test/unit/",
+    "integration_test": "jest --ci --forceExit --config=test/integration/jest-config.json --testPathPattern=test/integration/"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "json",
+      "text",
+      "lcov",
+      "clover"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    },
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/test/",
+      "<rootDir>/demo/",
+      "<rootDir>/node_modules/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/demo/",
+      "<rootDir>/node_modules/react-native/Libraries/react-native/"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.idea",
+      "<rootDir>/Libraries/",
+      "<rootDir>/coverage/",
+      "<rootDir>/docs/",
+      "<rootDir>/demo/",
+      "<rootDir>/node_modules/"
+    ],
+    "notify": true,
+    "preset": "react-native"
+  }
+}

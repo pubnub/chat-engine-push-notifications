@@ -1,0 +1,8 @@
+coverage
+demo
+test
+.babelrc
+.eslintrc
+.travis.yml
+package-lock.json
+gulpfile.babel.js

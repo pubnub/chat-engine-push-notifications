@@ -1,0 +1,496 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		79048A4F1F961A5B00A29059 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 79048A4E1F961A5B00A29059 /* main.m */; };
+		798B5CBE1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CBD1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m */; };
+		798B5CC11F97F63A007CB9B6 /* CEPNCreateChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CC01F97F63A007CB9B6 /* CEPNCreateChatViewController.m */; };
+		798B5CC31F98DA4A007CB9B6 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 798B5CC21F98DA41007CB9B6 /* MaterialIcons.ttf */; };
+		798B5CC61F98E7C9007CB9B6 /* CEPNInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 798B5CC51F98E7C9007CB9B6 /* CEPNInviteUserViewController.m */; };
+		799C6A301F973E090078BAB0 /* CEPNAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */; };
+		799C6A311F973E090078BAB0 /* CEPNChatsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */; };
+		799C6A321F973E090078BAB0 /* CEPNChatViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */; };
+		799C6A3E1F973E2E0078BAB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A371F973E2E0078BAB0 /* Assets.xcassets */; };
+		799C6A3F1F973E2E0078BAB0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A391F973E2E0078BAB0 /* LaunchScreen.storyboard */; };
+		799C6A401F973E2E0078BAB0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 799C6A3B1F973E2E0078BAB0 /* Main.storyboard */; };
+		799C6A441F9743460078BAB0 /* CEPNBridgeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 799C6A431F9743460078BAB0 /* CEPNBridgeManager.m */; };
+		79B2B8FD1F976FD600001726 /* CEPNChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B2B8FC1F976FD600001726 /* CEPNChatManager.m */; };
+		79B2B9001F97764800001726 /* CEPNAuthorizationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B2B8FF1F97764800001726 /* CEPNAuthorizationViewController.m */; };
+		79B2B9051F979AEB00001726 /* RCTConvert+CEPNChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 79B2B9041F979AEB00001726 /* RCTConvert+CEPNChatManager.m */; };
+		79B2B9081F97B60800001726 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79B2B9071F97B60700001726 /* SimpleLineIcons.ttf */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		79048A391F961A5B00A29059 /* ChatOnReact.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatOnReact.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		79048A4E1F961A5B00A29059 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		798B5CBC1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIBarButtonItem+CEPNBarButtonItem.h"; sourceTree = "<group>"; };
+		798B5CBD1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+CEPNBarButtonItem.m"; sourceTree = "<group>"; };
+		798B5CBF1F97F63A007CB9B6 /* CEPNCreateChatViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CEPNCreateChatViewController.h; sourceTree = "<group>"; };
+		798B5CC01F97F63A007CB9B6 /* CEPNCreateChatViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CEPNCreateChatViewController.m; sourceTree = "<group>"; };
+		798B5CC21F98DA41007CB9B6 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		798B5CC41F98E7C9007CB9B6 /* CEPNInviteUserViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CEPNInviteUserViewController.h; sourceTree = "<group>"; };
+		798B5CC51F98E7C9007CB9B6 /* CEPNInviteUserViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CEPNInviteUserViewController.m; sourceTree = "<group>"; };
+		798B5CC71F992042007CB9B6 /* ChatOnReact.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChatOnReact.entitlements; sourceTree = "<group>"; };
+		799C6A281F973E090078BAB0 /* CEPNAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNAppDelegate.h; sourceTree = "<group>"; };
+		799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNAppDelegate.m; sourceTree = "<group>"; };
+		799C6A2A1F973E090078BAB0 /* CEPNChatsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNChatsViewController.h; sourceTree = "<group>"; };
+		799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNChatsViewController.m; sourceTree = "<group>"; };
+		799C6A2C1F973E090078BAB0 /* CEPNChatViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CEPNChatViewController.h; sourceTree = "<group>"; };
+		799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CEPNChatViewController.m; sourceTree = "<group>"; };
+		799C6A351F973E2E0078BAB0 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		799C6A371F973E2E0078BAB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		799C6A3A1F973E2E0078BAB0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		799C6A3C1F973E2E0078BAB0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		799C6A421F9743460078BAB0 /* CEPNBridgeManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CEPNBridgeManager.h; sourceTree = "<group>"; };
+		799C6A431F9743460078BAB0 /* CEPNBridgeManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CEPNBridgeManager.m; sourceTree = "<group>"; };
+		79B2B8FB1F976FD600001726 /* CEPNChatManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CEPNChatManager.h; sourceTree = "<group>"; };
+		79B2B8FC1F976FD600001726 /* CEPNChatManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CEPNChatManager.m; sourceTree = "<group>"; };
+		79B2B8FE1F97764800001726 /* CEPNAuthorizationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CEPNAuthorizationViewController.h; sourceTree = "<group>"; };
+		79B2B8FF1F97764800001726 /* CEPNAuthorizationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CEPNAuthorizationViewController.m; sourceTree = "<group>"; };
+		79B2B9031F979AEB00001726 /* RCTConvert+CEPNChatManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTConvert+CEPNChatManager.h"; sourceTree = "<group>"; };
+		79B2B9041F979AEB00001726 /* RCTConvert+CEPNChatManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RCTConvert+CEPNChatManager.m"; sourceTree = "<group>"; };
+		79B2B9071F97B60700001726 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		79048A361F961A5B00A29059 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		79048A301F961A5B00A29059 = {
+			isa = PBXGroup;
+			children = (
+				79048A3B1F961A5B00A29059 /* ChatOnReact */,
+				79048A3A1F961A5B00A29059 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		79048A3A1F961A5B00A29059 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				79048A391F961A5B00A29059 /* ChatOnReact.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		79048A3B1F961A5B00A29059 /* ChatOnReact */ = {
+			isa = PBXGroup;
+			children = (
+				798B5CC71F992042007CB9B6 /* ChatOnReact.entitlements */,
+				799C6A261F973E090078BAB0 /* Classes */,
+				799C6A331F973E2E0078BAB0 /* Resources */,
+				79048A4E1F961A5B00A29059 /* main.m */,
+			);
+			path = ChatOnReact;
+			sourceTree = "<group>";
+		};
+		799C6A261F973E090078BAB0 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A271F973E090078BAB0 /* Controller */,
+				799C6A2E1F973E090078BAB0 /* Model */,
+				799C6A2F1F973E090078BAB0 /* View */,
+				79B2B9011F979AB700001726 /* Misc */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		799C6A271F973E090078BAB0 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A411F9743220078BAB0 /* React Native */,
+				799C6A281F973E090078BAB0 /* CEPNAppDelegate.h */,
+				799C6A291F973E090078BAB0 /* CEPNAppDelegate.m */,
+				799C6A2A1F973E090078BAB0 /* CEPNChatsViewController.h */,
+				799C6A2B1F973E090078BAB0 /* CEPNChatsViewController.m */,
+				799C6A2C1F973E090078BAB0 /* CEPNChatViewController.h */,
+				799C6A2D1F973E090078BAB0 /* CEPNChatViewController.m */,
+				79B2B8FE1F97764800001726 /* CEPNAuthorizationViewController.h */,
+				79B2B8FF1F97764800001726 /* CEPNAuthorizationViewController.m */,
+				798B5CBF1F97F63A007CB9B6 /* CEPNCreateChatViewController.h */,
+				798B5CC01F97F63A007CB9B6 /* CEPNCreateChatViewController.m */,
+				798B5CC41F98E7C9007CB9B6 /* CEPNInviteUserViewController.h */,
+				798B5CC51F98E7C9007CB9B6 /* CEPNInviteUserViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		799C6A2E1F973E090078BAB0 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		799C6A2F1F973E090078BAB0 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		799C6A331F973E2E0078BAB0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				79B2B9061F97B60700001726 /* Fonts */,
+				799C6A341F973E2E0078BAB0 /* General */,
+				799C6A361F973E2E0078BAB0 /* Images */,
+				799C6A381F973E2E0078BAB0 /* Interface */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		799C6A341F973E2E0078BAB0 /* General */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A351F973E2E0078BAB0 /* Info.plist */,
+			);
+			path = General;
+			sourceTree = "<group>";
+		};
+		799C6A361F973E2E0078BAB0 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A371F973E2E0078BAB0 /* Assets.xcassets */,
+			);
+			path = Images;
+			sourceTree = "<group>";
+		};
+		799C6A381F973E2E0078BAB0 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A391F973E2E0078BAB0 /* LaunchScreen.storyboard */,
+				799C6A3B1F973E2E0078BAB0 /* Main.storyboard */,
+			);
+			path = Interface;
+			sourceTree = "<group>";
+		};
+		799C6A411F9743220078BAB0 /* React Native */ = {
+			isa = PBXGroup;
+			children = (
+				799C6A421F9743460078BAB0 /* CEPNBridgeManager.h */,
+				799C6A431F9743460078BAB0 /* CEPNBridgeManager.m */,
+				79B2B8FB1F976FD600001726 /* CEPNChatManager.h */,
+				79B2B8FC1F976FD600001726 /* CEPNChatManager.m */,
+			);
+			path = "React Native";
+			sourceTree = "<group>";
+		};
+		79B2B9011F979AB700001726 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				79B2B9021F979AB700001726 /* Categories */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
+		79B2B9021F979AB700001726 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				79B2B9031F979AEB00001726 /* RCTConvert+CEPNChatManager.h */,
+				79B2B9041F979AEB00001726 /* RCTConvert+CEPNChatManager.m */,
+				798B5CBC1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.h */,
+				798B5CBD1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		79B2B9061F97B60700001726 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				798B5CC21F98DA41007CB9B6 /* MaterialIcons.ttf */,
+				79B2B9071F97B60700001726 /* SimpleLineIcons.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		79048A381F961A5B00A29059 /* ChatOnReact */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79048A521F961A5B00A29059 /* Build configuration list for PBXNativeTarget "ChatOnReact" */;
+			buildPhases = (
+				79048A351F961A5B00A29059 /* Sources */,
+				79048A361F961A5B00A29059 /* Frameworks */,
+				79048A371F961A5B00A29059 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChatOnReact;
+			productName = ChatOnReact;
+			productReference = 79048A391F961A5B00A29059 /* ChatOnReact.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		79048A311F961A5B00A29059 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = CEPN;
+				LastUpgradeCheck = 0900;
+				ORGANIZATIONNAME = PubNub;
+				TargetAttributes = {
+					79048A381F961A5B00A29059 = {
+						CreatedOnToolsVersion = 9.0.1;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 79048A341F961A5B00A29059 /* Build configuration list for PBXProject "ChatOnReact" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 79048A301F961A5B00A29059;
+			productRefGroup = 79048A3A1F961A5B00A29059 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				79048A381F961A5B00A29059 /* ChatOnReact */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		79048A371F961A5B00A29059 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				799C6A401F973E2E0078BAB0 /* Main.storyboard in Resources */,
+				79B2B9081F97B60800001726 /* SimpleLineIcons.ttf in Resources */,
+				798B5CC31F98DA4A007CB9B6 /* MaterialIcons.ttf in Resources */,
+				799C6A3F1F973E2E0078BAB0 /* LaunchScreen.storyboard in Resources */,
+				799C6A3E1F973E2E0078BAB0 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		79048A351F961A5B00A29059 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				799C6A301F973E090078BAB0 /* CEPNAppDelegate.m in Sources */,
+				79B2B8FD1F976FD600001726 /* CEPNChatManager.m in Sources */,
+				798B5CC11F97F63A007CB9B6 /* CEPNCreateChatViewController.m in Sources */,
+				798B5CBE1F97E4D9007CB9B6 /* UIBarButtonItem+CEPNBarButtonItem.m in Sources */,
+				799C6A311F973E090078BAB0 /* CEPNChatsViewController.m in Sources */,
+				799C6A441F9743460078BAB0 /* CEPNBridgeManager.m in Sources */,
+				79B2B9051F979AEB00001726 /* RCTConvert+CEPNChatManager.m in Sources */,
+				79048A4F1F961A5B00A29059 /* main.m in Sources */,
+				799C6A321F973E090078BAB0 /* CEPNChatViewController.m in Sources */,
+				79B2B9001F97764800001726 /* CEPNAuthorizationViewController.m in Sources */,
+				798B5CC61F98E7C9007CB9B6 /* CEPNInviteUserViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		799C6A391F973E2E0078BAB0 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				799C6A3A1F973E2E0078BAB0 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		799C6A3B1F973E2E0078BAB0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				799C6A3C1F973E2E0078BAB0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		79048A501F961A5B00A29059 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		79048A511F961A5B00A29059 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		79048A531F961A5B00A29059 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ChatOnReact/ChatOnReact.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = "$(SRCROOT)/ChatOnReact/Resources/General/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pubnub.ChatOnReact;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		79048A541F961A5B00A29059 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ChatOnReact/ChatOnReact.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = "$(SRCROOT)/ChatOnReact/Resources/General/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.pubnub.ChatOnReact;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		79048A341F961A5B00A29059 /* Build configuration list for PBXProject "ChatOnReact" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79048A501F961A5B00A29059 /* Debug */,
+				79048A511F961A5B00A29059 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79048A521F961A5B00A29059 /* Build configuration list for PBXNativeTarget "ChatOnReact" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79048A531F961A5B00A29059 /* Debug */,
+				79048A541F961A5B00A29059 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 79048A311F961A5B00A29059 /* Project object */;
+}
