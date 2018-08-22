@@ -10,8 +10,9 @@
  * @typedef {Object} CEConfiguration
  * @property {!String[]} events - List of events for which push notification payload should be created.
  * @property {String[]} [ignoredChats='#read.#feed'] - List of chats for which it is not required to register on push notifications.
+ * @property {String} [messageKey='message'] - Name of key under which stored published message, which should be handled by default formatter.
  * @property {!CEPlatforms} platforms Available platforms for push notification should be constructed when {@link ChatEngine} send events.
- * @property {Boolean} [markAsSeen=true] - Whether received notification should be marked as `seen` or not when received (when `$.notification` event
+ * @property {Boolean} [markAsSeen=true] - Whether received notification should be marked as `seen` or not when received (when `$notification` event
  *     is sent).
  * @property {CEFormatterCallback} [formatter] - Called each time when {@link ChatEngine} is about to send one of tracked `events` make layout
  *     formatting for notification.

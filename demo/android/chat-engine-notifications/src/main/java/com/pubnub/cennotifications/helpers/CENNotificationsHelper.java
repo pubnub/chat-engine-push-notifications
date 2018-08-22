@@ -222,11 +222,11 @@ public class CENNotificationsHelper {
      * Retrieve reference on delivered notification with specific chat engine identifier.
      *
      * @param context Reference on execution context.
-     * @return Reference on notification representation instance or 'null' if notification with specified 'ceid' not
+     * @return Reference on notification representation instance or 'null' if notification with specified 'eid' not
      *         found.
      */
     @SuppressWarnings("unchecked")
-    public static CENNotification deliveredNotification(Context context, String ceid) {
+    public static CENNotification deliveredNotification(Context context, String eid) {
         List<Map<String, Object>> deliveredNotifications = deliveredNotifications(context);
         CENNotification notification = null;
 
@@ -234,10 +234,10 @@ public class CENNotificationsHelper {
             CENNotification deliveredNotification = new CENNotification(context, payload);
             Map<String, Object> cePayload = deliveredNotification.chatEnginePayload();
 
-            if (ceid != null && cePayload != null && cePayload.containsKey("ceid")) {
-                String deliveredNotificationCEId = (String) cePayload.get("ceid");
+            if (eid != null && cePayload != null && cePayload.containsKey("eid")) {
+                String deliveredNotificationEID = (String) cePayload.get("eid");
 
-                if (deliveredNotificationCEId != null && deliveredNotificationCEId.equalsIgnoreCase(ceid)) {
+                if (deliveredNotificationEID != null && deliveredNotificationEID.equalsIgnoreCase(eid)) {
                     notification = deliveredNotification;
                     break;
                 }

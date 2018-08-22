@@ -34,8 +34,8 @@ describe('unittest::CENotificationFormatter', () => {
     const seenEventPayload = {
         chat: { channel: 'direct' },
         sender: 'PubNub',
-        event: '$.notifications.seen',
-        data: { ceid: 'unique-id' }
+        event: '$notifications.seen',
+        data: { eid: 'unique-id' }
     };
 
     describe('#category', () => {
@@ -47,8 +47,8 @@ describe('unittest::CENotificationFormatter', () => {
             expect(CENotificationFormatter.category('$.leave')).toEqual('com.pubnub.chat-engine.leave');
         });
 
-        test('should return category for \'$.notifications.received\' event', () => {
-            expect(CENotificationFormatter.category('$.notifications.received')).toEqual('com.pubnub.chat-engine.notifications.received');
+        test('should return category for \'$notifications.received\' event', () => {
+            expect(CENotificationFormatter.category('$notifications.received')).toEqual('com.pubnub.chat-engine.notifications.received');
         });
 
         test('should return category for \'message\' event', () => {
@@ -213,7 +213,7 @@ describe('unittest::CENotificationFormatter', () => {
             expect(notificationPayload.apns.aps['content-available']).toBeDefined();
             expect(notificationPayload.apns.cepayload).toBeDefined();
             expect(notificationPayload.apns.cepayload.data).toBeDefined();
-            expect(notificationPayload.apns.cepayload.data.ceid).toBeDefined();
+            expect(notificationPayload.apns.cepayload.data.eid).toBeDefined();
             expect(notificationPayload.gcm).not.toBeDefined();
         });
 
@@ -222,7 +222,7 @@ describe('unittest::CENotificationFormatter', () => {
             expect(TypeValidator.notEmpty(notificationPayload)).toBeTruthy();
             expect(notificationPayload.gcm.data.cepayload).toBeDefined();
             expect(notificationPayload.gcm.data.cepayload.data).toBeDefined();
-            expect(notificationPayload.gcm.data.cepayload.data.ceid).toBeDefined();
+            expect(notificationPayload.gcm.data.cepayload.data.eid).toBeDefined();
             expect(notificationPayload.apns).not.toBeDefined();
         });
 
@@ -241,7 +241,7 @@ describe('unittest::CENotificationFormatter', () => {
                 .toThrowError(/Unexpected payload: not defined or has unexpected type \(Object expected\)/);
         });
 
-        test('should not throw if CEID is \'undefined\' in non-test environment', () => {
+        test('should not throw if EID is \'undefined\' in non-test environment', () => {
             const payload = Object.assign({}, seenEventPayload, { data: { } });
             const originalNodeEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = 'production';
@@ -252,22 +252,22 @@ describe('unittest::CENotificationFormatter', () => {
             process.env.NODE_ENV = originalNodeEnv;
         });
 
-        test('should throw TypeError when \'payload.data.ceid\' is \'undefined\'', () => {
+        test('should throw TypeError when \'payload.data.eid\' is \'undefined\'', () => {
             const payload = Object.assign({}, seenEventPayload, { data: { } });
             expect(() => CENotificationFormatter.seenNotification(payload))
-                .toThrowError(/Unexpected CEID: empty or has unexpected type \(string expected\)/);
+                .toThrowError(/Unexpected EID: empty or has unexpected type \(string expected\)/);
         });
 
-        test('should throw TypeError when \'payload.data.ceid\' is not type of String', () => {
-            const payload = Object.assign({}, seenEventPayload, { data: { ceid: 2010 } });
+        test('should throw TypeError when \'payload.data.eid\' is not type of String', () => {
+            const payload = Object.assign({}, seenEventPayload, { data: { eid: 2010 } });
             expect(() => CENotificationFormatter.seenNotification(payload))
-                .toThrowError(/Unexpected CEID: empty or has unexpected type \(string expected\)/);
+                .toThrowError(/Unexpected EID: empty or has unexpected type \(string expected\)/);
         });
 
-        test('should throw TypeError when \'payload.data.ceid\' is empty String', () => {
-            const payload = Object.assign({}, seenEventPayload, { data: { ceid: '' } });
+        test('should throw TypeError when \'payload.data.eid\' is empty String', () => {
+            const payload = Object.assign({}, seenEventPayload, { data: { eid: '' } });
             expect(() => CENotificationFormatter.seenNotification(payload))
-                .toThrowError(/Unexpected CEID: empty or has unexpected type \(string expected\)/);
+                .toThrowError(/Unexpected EID: empty or has unexpected type \(string expected\)/);
         });
     });
 
@@ -285,8 +285,8 @@ describe('unittest::CENotificationFormatter', () => {
         test('should not change passed \'cepayload\' content for iOS', () => {
             const originalPlatform = Platform.OS;
             Platform.OS = 'ios';
-            const notification = { apns: { aps: { }, cepayload: { some: 'fun', data: { ceid: 'cool' } } } };
-            const expected = { apns: { aps: { }, cepayload: { some: 'fun', data: { ceid: 'cool' } } } };
+            const notification = { apns: { aps: { }, cepayload: { some: 'fun', data: { eid: 'cool' } } } };
+            const expected = { apns: { aps: { }, cepayload: { some: 'fun', data: { eid: 'cool' } } } };
             CENotificationFormatter.normalized(leaveEventPayload, notification);
 
             expect(notification.apns.cepayload).toBeDefined();
@@ -298,7 +298,7 @@ describe('unittest::CENotificationFormatter', () => {
         test('should use category from \'aps.category\' and not built from event for iOS', () => {
             const originalPlatform = Platform.OS;
             Platform.OS = 'ios';
-            const notification = { apns: { aps: { category: 'fun.category' }, cepayload: { some: 'fun', data: { ceid: 'cool' } } } };
+            const notification = { apns: { aps: { category: 'fun.category' }, cepayload: { some: 'fun', data: { eid: 'cool' } } } };
             const normalizedNotification = CENotificationFormatter.normalized(leaveEventPayload, notification);
 
             expect(normalizedNotification.pn_apns.aps.category).toEqual(notification.apns.aps.category);
@@ -310,7 +310,7 @@ describe('unittest::CENotificationFormatter', () => {
         test('should use category from \'cepayload.category\' and not built from event for iOS', () => {
             const originalPlatform = Platform.OS;
             Platform.OS = 'ios';
-            const notification = { apns: { aps: { }, cepayload: { category: 'fun.category', some: 'fun', data: { ceid: 'cool' } } } };
+            const notification = { apns: { aps: { }, cepayload: { category: 'fun.category', some: 'fun', data: { eid: 'cool' } } } };
             const normalizedNotification = CENotificationFormatter.normalized(leaveEventPayload, notification);
 
             expect(normalizedNotification.pn_apns.aps.category).toEqual(notification.apns.cepayload.category);
@@ -335,7 +335,7 @@ describe('unittest::CENotificationFormatter', () => {
         test('should use category from \'data.category\' and not built from event for Android', () => {
             const originalPlatform = Platform.OS;
             Platform.OS = 'android';
-            const notification = { gcm: { data: { category: 'fun.category', cepayload: { some: 'fun', data: { ceid: 'cool' } } } } };
+            const notification = { gcm: { data: { category: 'fun.category', cepayload: { some: 'fun', data: { eid: 'cool' } } } } };
             const normalizedNotification = CENotificationFormatter.normalized(leaveEventPayload, notification);
 
             expect(normalizedNotification.pn_gcm.data.category).toEqual(notification.gcm.data.category);
@@ -347,7 +347,7 @@ describe('unittest::CENotificationFormatter', () => {
         test('should not add category from \'cepayload.category\' to \'data\' objet root for Android', () => {
             const originalPlatform = Platform.OS;
             Platform.OS = 'android';
-            const notification = { gcm: { data: { cepayload: { category: 'fun.category', some: 'fun', data: { ceid: 'cool' } } } } };
+            const notification = { gcm: { data: { cepayload: { category: 'fun.category', some: 'fun', data: { eid: 'cool' } } } } };
             const normalizedNotification = CENotificationFormatter.normalized(leaveEventPayload, notification);
 
             expect(normalizedNotification.pn_gcm.data.category).not.toBeDefined();
@@ -382,16 +382,16 @@ describe('unittest::CENotificationFormatter', () => {
             const notification = { apns: { aps: { alert: 'Notification' } } };
             const normalized = CENotificationFormatter.normalized(leaveEventPayload, Object.assign({}, notification));
             expect(TypeValidator.isTypeOf(normalized.pn_apns.cepayload, Object)).toBeTruthy();
-            expect(TypeValidator.isTypeOf(normalized.pn_apns.cepayload.ceid, String)).toBeTruthy();
-            expect(TypeValidator.notEmpty(normalized.pn_apns.cepayload.ceid)).toBeTruthy();
+            expect(TypeValidator.isTypeOf(normalized.pn_apns.cepayload.eid, String)).toBeTruthy();
+            expect(TypeValidator.notEmpty(normalized.pn_apns.cepayload.eid)).toBeTruthy();
         });
 
         test('should add notification String identifier for \'gcm\'', () => {
             const notification = { gcm: { notification: { title: 'Notification' } } };
             const normalized = CENotificationFormatter.normalized(leaveEventPayload, Object.assign({}, notification));
             expect(TypeValidator.isTypeOf(normalized.pn_gcm.data.cepayload, Object)).toBeTruthy();
-            expect(TypeValidator.isTypeOf(normalized.pn_gcm.data.cepayload.ceid, String)).toBeTruthy();
-            expect(TypeValidator.notEmpty(normalized.pn_gcm.data.cepayload.ceid)).toBeTruthy();
+            expect(TypeValidator.isTypeOf(normalized.pn_gcm.data.cepayload.eid, String)).toBeTruthy();
+            expect(TypeValidator.notEmpty(normalized.pn_gcm.data.cepayload.eid)).toBeTruthy();
         });
 
         test('should not throw if malformed payload provided in non-test environment', () => {

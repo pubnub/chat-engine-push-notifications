@@ -237,7 +237,7 @@ export default class CENotifications extends EventEmitter2 {
 
     /**
      * Try to retrieve push notification payload which has been used to launch application.
-     * If any remote notification has been used to open application it will be sent along with `$.notifications.received` event.
+     * If any remote notification has been used to open application it will be sent along with `$notifications.received` event.
      *
      * @example <caption>Request for initial notification</caption>
      * import { plugin } from 'chat-engine-notifications';
@@ -250,7 +250,7 @@ export default class CENotifications extends EventEmitter2 {
      * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
      * // '$.ready' event.
      * ChatEngine.on('$.ready', () => {
-     *     ChatEngine.me.notifications.on('$.notifications.received', notification => {
+     *     ChatEngine.me.notifications.on('$notifications.received', notification => {
      *          // Initial messages delivered with 'foreground' set to 'false'.
      *         if (!notification.foreground) {
      *             console.log(`Received initial notification: ${JSON.stringify(notification.notification)}`);
@@ -336,11 +336,11 @@ export default class CENotifications extends EventEmitter2 {
      * @param {Object} token - Received device push token information object.
      * @param {String} token.deviceToken - Reference on actual device push token which should be used with chat channels registration API.
      *
-     * @emits {$.notifications.registered} emit event when native module reported back what device did receive notification token.
+     * @emits {$notifications.registered} emit event when native module reported back what device did receive notification token.
      * @private
      */
     onRegister(token) {
-        this.emit('$.notifications.registered', token.deviceToken);
+        this.emit('$notifications.registered', token.deviceToken);
     }
 
     /**
@@ -348,18 +348,18 @@ export default class CENotifications extends EventEmitter2 {
      *
      * @param {Object} error - Received registration error explanation.
      *
-     * @emits {$.notifications.registration.fail} emit event when native module reported back what device registration did fail.
+     * @emits {$notifications.registration.fail} emit event when native module reported back what device registration did fail.
      * @private
      */
     onRegistrationFail(error) {
-        this.emit('$.notifications.registration.fail', error);
+        this.emit('$notifications.registration.fail', error);
     }
 
     /**
      * Handle incoming push notification.
      *
      * @param {CENNotificationPayload} payload - Reference on object which contain information about pushed data and completion callback (if passed).
-     * @emits {$.notifications.received} emit when device receive new remote notification sent by **PubNub** service on request of remote user.
+     * @emits {$notifications.received} emit when device receive new remote notification sent by **PubNub** service on request of remote user.
      *
      * @throws {TypeError} in case if passed `notification` is not type of _object_ or empty.
      * @private
@@ -377,6 +377,6 @@ export default class CENotifications extends EventEmitter2 {
         } else if (TypeValidator.isTypeOf(payload.completion, 'function')) {
             payload.completion('noData');
         }
-        this.emit('$.notifications.received', payload);
+        this.emit('$notifications.received', payload);
     }
 }

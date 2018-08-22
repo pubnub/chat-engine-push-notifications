@@ -54,10 +54,11 @@ export default class CENotificationFormatter {
      *
      * @param {ChatEngineEventPayload} eventPayload - Reference on payload which has been emitted with {@link Event}.
      * @param {CEPlatforms} platforms - Reference on list of platforms for which payload should be composed.
+     * @param {String} [messageKey='message'] - Name of key under which stored published message, which should be handled by default formatter.
      * @return {Object} Reference on modified {@link Event} payload which include keys required to trigger remote notification sending for requested
      *     {@link CEPlatforms}.
      */
-    static notifications(eventPayload, platforms) {
+    static notifications(eventPayload, platforms, messageKey = 'message') {
         if (!CENotificationFormatter.verifyChatEnginePayload(eventPayload)) {
             return {};
         }
@@ -75,7 +76,7 @@ export default class CENotificationFormatter {
         let notificationCategory = null;
         if (eventPayload.event === 'message') {
             notificationTitle = `${eventPayload.sender} send message in ${chatName}`;
-            notificationBody = eventPayload.data.message;
+            notificationBody = eventPayload.data[messageKey];
             notificationTicker = 'New chat message';
             notificationCategory = CENNotifications.CATEGORY_MESSAGE;
         } else if (eventPayload.event === '$.invite') {
@@ -123,8 +124,8 @@ export default class CENotificationFormatter {
         if (!CENotificationFormatter.verifyChatEnginePayload(payload)) {
             return {};
         }
-        if (!TypeValidator.isDefined(payload.data.ceid) || !TypeValidator.sequence(payload.data.ceid, [['isTypeOf', String], 'notEmpty'])) {
-            throwError(new TypeError('Unexpected CEID: empty or has unexpected type (string expected).'));
+        if (!TypeValidator.isDefined(payload.data.eid) || !TypeValidator.sequence(payload.data.eid, [['isTypeOf', String], 'notEmpty'])) {
+            throwError(new TypeError('Unexpected EID: empty or has unexpected type (string expected).'));
             return {};
         }
 
@@ -163,7 +164,7 @@ export default class CENotificationFormatter {
             chat: eventPayload.chat.channel,
             event: eventPayload.event,
             data: eventPayload.data,
-            ceid: uuidv4(),
+            eid: uuidv4(),
             category
         };
 
