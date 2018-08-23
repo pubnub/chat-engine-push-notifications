@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
-/* global test, expect */
+/* global test, expect, jasmine */
 import ChatEngineCore from 'chat-engine';
 import { plugin } from '../../src/plugin';
 
@@ -34,7 +34,12 @@ describe('integration::ChatEngineNotifications', () => {
     let chatEngine;
 
     beforeEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
         chatEngine = ChatEngineCore.create({ publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY });
+    });
+
+    afterEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
     });
 
     test('should add \'notifications\' property to Me', (done) => {
@@ -174,26 +179,26 @@ describe('integration::ChatEngineNotifications', () => {
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
-    test('should send $.notifications.seen event', (done) => {
-        const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+    test('should send $notifications.seen event', (done) => {
+        const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { eid: 'unique' } }, foreground: true };
         let messageReceived = false;
         chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
         chatEngine.on('$.ready', () => {
             const messageHandler = (message) => {
                 messageReceived = true;
-                chatEngine.me.direct.off('$.notifications.seen', messageHandler);
+                chatEngine.me.direct.off('$notifications.seen', messageHandler);
                 expect(message.pn_apns).toBeDefined();
                 expect(message.pn_apns.cepayload).toBeDefined();
-                expect(message.pn_apns.cepayload.data.ceid).toEqual(notification.notification.cepayload.ceid);
+                expect(message.pn_apns.cepayload.data.eid).toEqual(notification.notification.cepayload.eid);
                 expect(message.pn_gcm).toBeDefined();
                 expect(message.pn_gcm.data.cepayload).toBeDefined();
-                expect(message.pn_gcm.data.cepayload.data.ceid).toEqual(notification.notification.cepayload.ceid);
+                expect(message.pn_gcm.data.cepayload.data.eid).toEqual(notification.notification.cepayload.eid);
                 jest.clearAllTimers();
                 done();
             };
             const connectionHandler = () => {
                 chatEngine.me.direct.off('$.connected', connectionHandler);
-                chatEngine.me.direct.on('$.notifications.seen', messageHandler);
+                chatEngine.me.direct.on('$notifications.seen', messageHandler);
                 chatEngine.me.notifications.markNotificationAsSeen(notification);
                 let retryInterval = setInterval(() => {
                     if (!messageReceived) {

@@ -32,7 +32,7 @@ public class CENNotifications extends ReactContextBaseJavaModule {
     final private static String BROADCAST_DID_REGISTER_DEVICE = "CENRegisteredForRemoteNotifications";
     final private static String JS_DID_REGISTER_DEVICE = "CENRegistered";
 
-    final private static String CHAT_ENGINE_SEEN_EVENT = "$.notifications.seen";
+    final private static String CHAT_ENGINE_SEEN_EVENT = "$notifications.seen";
     final private static String NOTIFICATION_DEFAULT_EVENT = "com.pubnub.cennotifications.default-event";
 
     /**
@@ -410,16 +410,16 @@ public class CENNotifications extends ReactContextBaseJavaModule {
         if (chatEnginePayload != null && chatEngineEvent != null && chatEngineEvent.equalsIgnoreCase(CHAT_ENGINE_SEEN_EVENT)) {
             NotificationManager notificationManager = ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));
             Map cePayloadData = (Map) chatEnginePayload.get("data");
-            if (cePayloadData != null && cePayloadData.containsKey("ceid") && notificationManager != null) {
-                String ceid = (String) cePayloadData.get("ceid");
+            if (cePayloadData != null && cePayloadData.containsKey("eid") && notificationManager != null) {
+                String eid = (String) cePayloadData.get("eid");
 
-                if (ceid.equalsIgnoreCase("all")) {
+                if (eid.equalsIgnoreCase("all")) {
                     CENNotificationsHelper.Logi("CENNotifications#markNotificationAsSeen: all notifications.");
                     CENNotificationsHelper.clearDeliveredNotifications(context);
                     notificationManager.cancelAll();
                 } else {
-                    CENNotificationsHelper.Logi("CENNotifications#markNotificationAsSeen: notifications with " + ceid + " id.");
-                    CENNotification deliveredNotification = CENNotificationsHelper.deliveredNotification(context, ceid);
+                    CENNotificationsHelper.Logi("CENNotifications#markNotificationAsSeen: notifications with " + eid + " id.");
+                    CENNotification deliveredNotification = CENNotificationsHelper.deliveredNotification(context, eid);
                     if (deliveredNotification != null) {
                         CENNotificationsHelper.removeDeliveredNotification(context, deliveredNotification);
                         notificationManager.cancel(deliveredNotification.id());

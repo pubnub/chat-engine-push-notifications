@@ -50,13 +50,13 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * Create and configure {@link ChatEngine} plugin to work with push notifications.
      *
      * @param {!CEConfiguration} configuration - Push notification registration/handling options.
-     * @listens {$.notifications.registered} listen event to start push notification management for chat which requested it.
-     * @listens {$.notifications.received} listen event to mark received notification as `seen` (if `configuration.markAsSeen` is set to `true`).
-     * @listens {$.created.chat} listen event to enable push notifications on just created chat if it explicitly not ignored
+     * @listens {$notifications.registered} listen event to start push notification management for chat which requested it.
+     * @listens {$notifications.received} listen event to mark received notification as `seen` (if `configuration.markAsSeen` is set to `true`).
+     * @listens {$created.chat} listen event to enable push notifications on just created chat if it explicitly not ignored
      *     (`configuration.ignoredChats`).
-     * @listens {$.notifications.connected} listen event to enable push notifications on chat if it explicitly not ignored
+     * @listens {$notifications.connected} listen event to enable push notifications on chat if it explicitly not ignored
      *     (`configuration.ignoredChats`).
-     * @listens {$.notifications.disconnected} listen event to disable push notifications on chat.
+     * @listens {$notifications.disconnected} listen event to disable push notifications on chat.
      * @example <caption>Simple setup</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
@@ -167,9 +167,9 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     construct() {
         /** @type CENotifications */
         this.parent.notifications = this.notifications;
-        this.parent.notifications.on('$.notifications.registered', this._onDeviceRegister);
+        this.parent.notifications.on('$notifications.registered', this._onDeviceRegister);
         if (this.configuration.markAsSeen) {
-            this.parent.notifications.on('$.notifications.received', this._onNotification);
+            this.parent.notifications.on('$notifications.received', this._onNotification);
         }
         this.ChatEngine.on('$.created.chat', this._onChatCreate);
         this.ChatEngine.on('$.connected', this._onChatConnect);
@@ -186,9 +186,9 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         destructingInstances.push(this);
 
         // Stop listening events from other modules.
-        this.parent.notifications.off('$.notifications.registered', this._onDeviceRegister);
+        this.parent.notifications.off('$notifications.registered', this._onDeviceRegister);
         if (this.configuration.markAsSeen) {
-            this.parent.notifications.off('$.notifications.received', this._onNotification);
+            this.parent.notifications.off('$notifications.received', this._onNotification);
         }
         this.ChatEngine.off('$.created.chat', this._onChatCreate);
         this.ChatEngine.off('$.connected', this._onChatConnect);
@@ -241,10 +241,10 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         }
 
         if (TypeValidator.isDefined(notification.notification.cepayload) && (notification.userInteraction || notification.foreground)) {
-            const { ceid, event } = notification.notification.cepayload;
-            if (TypeValidator.isDefined(ceid) && event !== '$.notifications.seen') {
-                this.parent.notifications.emit('$.notifications.seen');
-                this.ChatEngine.me.direct.emit('$.notifications.seen', { ceid });
+            const { eid, event } = notification.notification.cepayload;
+            if (TypeValidator.isDefined(eid) && event !== '$notifications.seen') {
+                this.parent.notifications.emit('$notifications.seen');
+                this.ChatEngine.me.direct.emit('$notifications.seen', { eid });
             }
         }
     }
@@ -254,8 +254,8 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @private
      */
     markAllNotificationAsSeen() {
-        this.parent.notifications.emit('$.notifications.seen');
-        this.ChatEngine.me.direct.emit('$.notifications.seen', { ceid: 'all' });
+        this.parent.notifications.emit('$notifications.seen');
+        this.ChatEngine.me.direct.emit('$notifications.seen', { eid: 'all' });
     }
 
     /**
@@ -359,7 +359,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         payload.data = payload.data || {};
 
         // Mark notification as seen event.
-        if (event === '$.notifications.seen') {
+        if (event === '$notifications.seen') {
             formattedPayload = CENotificationFormatter.seenNotification(payload, this.configuration.platforms);
             next(null, CENotificationFormatter.normalized(payload, formattedPayload));
             return;
@@ -369,6 +369,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (formatterProvided) {
             formattedPayload = this.configuration.formatter(payload);
         }
+
         if (!formatterProvided || (formatterProvided && formattedPayload === null)) {
             let nativePayload = {
                 event,
@@ -376,9 +377,10 @@ export class CENotificationsExtension extends ChatEnginePlugin {
                 chat: payload.chat.channel,
                 data: payload.data
             };
+
             this.parent.notifications.formatNotificationPayload(nativePayload, (nativeFormattedPayload, canFormat) => {
                 if (!canFormat || nativeFormattedPayload === null) {
-                    formattedPayload = CENotificationFormatter.notifications(payload, this.configuration.platforms);
+                    formattedPayload = CENotificationFormatter.notifications(payload, this.configuration.platforms, this.configuration.messageKey);
                 } else {
                     formattedPayload = nativeFormattedPayload;
                 }
@@ -521,6 +523,11 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (!TypeValidator.isDefined(configuration.markAsSeen)) {
             configuration.markAsSeen = false;
         }
+
+        if (!TypeValidator.isDefined(configuration.messageKey)) {
+            configuration.messageKey = 'message';
+        }
+
         // Add additional channel for exclusion. There is no use for remote users to receive messages for local user activity as notifications.
         configuration.ignoredChats = configuration.ignoredChats || [];
         if (!configuration.ignoredChats.includes('#read.#feed')) {
@@ -528,8 +535,8 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         }
 
         // Add additional event to list of events which should be pre-processed before sending.
-        if (!configuration.events.includes('$.notifications.seen')) {
-            configuration.events.push('$.notifications.seen');
+        if (!configuration.events.includes('$notifications.seen')) {
+            configuration.events.push('$notifications.seen');
         }
     }
 

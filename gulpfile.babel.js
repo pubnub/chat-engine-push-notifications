@@ -3,7 +3,7 @@ import eslint from 'gulp-eslint';
 import runSequence from 'run-sequence';
 import shell from 'gulp-shell';
 
-gulp.task('integration_test', shell.task('npm run integrationTest'));
+gulp.task('integration_test', shell.task('npm run integration_test'));
 gulp.task('unit_tests', shell.task('npm run unit_test'));
 gulp.task('full_test', shell.task('npm run test'));
 
