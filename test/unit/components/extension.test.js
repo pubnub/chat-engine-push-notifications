@@ -820,7 +820,8 @@ describe('unittest::CENotificationsExtension', () => {
                 expect(notificationsSpy).toHaveBeenCalledWith(
                     inviteEvent,
                     extension.configuration.platforms,
-                    extension.configuration.messageKey);
+                    extension.configuration.messageKey
+                );
                 expect(next).toHaveBeenCalled();
                 done();
             });
@@ -835,7 +836,8 @@ describe('unittest::CENotificationsExtension', () => {
                 expect(notificationsSpy).toHaveBeenCalledWith(
                     inviteEvent,
                     extension.configuration.platforms,
-                    extension.configuration.messageKey);
+                    extension.configuration.messageKey
+                );
                 expect(next).toHaveBeenCalled();
                 done();
             });
