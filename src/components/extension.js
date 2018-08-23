@@ -369,6 +369,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (formatterProvided) {
             formattedPayload = this.configuration.formatter(payload);
         }
+
         if (!formatterProvided || (formatterProvided && formattedPayload === null)) {
             let nativePayload = {
                 event,
@@ -522,6 +523,11 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (!TypeValidator.isDefined(configuration.markAsSeen)) {
             configuration.markAsSeen = false;
         }
+
+        if (!TypeValidator.isDefined(configuration.messageKey)) {
+            configuration.messageKey = 'message';
+        }
+
         // Add additional channel for exclusion. There is no use for remote users to receive messages for local user activity as notifications.
         configuration.ignoredChats = configuration.ignoredChats || [];
         if (!configuration.ignoredChats.includes('#read.#feed')) {

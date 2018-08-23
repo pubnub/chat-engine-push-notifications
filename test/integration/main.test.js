@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
-/* global test, expect */
+/* global test, expect, jasmine */
 import ChatEngineCore from 'chat-engine';
 import { plugin } from '../../src/plugin';
 
@@ -34,7 +34,12 @@ describe('integration::ChatEngineNotifications', () => {
     let chatEngine;
 
     beforeEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
         chatEngine = ChatEngineCore.create({ publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY });
+    });
+
+    afterEach(() => {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
     });
 
     test('should add \'notifications\' property to Me', (done) => {

@@ -28,7 +28,7 @@ export default class CENotificationFormatter {
             throwError(new TypeError('Unexpected event: empty or has unexpected data type (string expected).'));
             return null;
         }
-        return `com.pubnub.chat-engine.${event.indexOf('$.') === 0 ? event.slice(2) : event}`;
+        return `com.pubnub.chat-engine.${event.indexOf('$') === 0 ? event.slice(event.indexOf('.') === 1 ? 2 : 1) : event}`;
     }
 
     /**

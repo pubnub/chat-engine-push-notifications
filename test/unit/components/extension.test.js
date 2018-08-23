@@ -817,7 +817,10 @@ describe('unittest::CENotificationsExtension', () => {
             const next = jest.fn();
             NativeModules.CENNotifications.formatNotificationPayload = jest.fn((nativePayload, callback) => {
                 callback(null, false);
-                expect(notificationsSpy).toHaveBeenCalledWith(inviteEvent, extension.configuration.platforms);
+                expect(notificationsSpy).toHaveBeenCalledWith(
+                    inviteEvent,
+                    extension.configuration.platforms,
+                    extension.configuration.messageKey);
                 expect(next).toHaveBeenCalled();
                 done();
             });
@@ -829,7 +832,10 @@ describe('unittest::CENotificationsExtension', () => {
             const next = jest.fn();
             NativeModules.CENNotifications.formatNotificationPayload = jest.fn((nativePayload, callback) => {
                 callback(null, true);
-                expect(notificationsSpy).toHaveBeenCalledWith(inviteEvent, extension.configuration.platforms);
+                expect(notificationsSpy).toHaveBeenCalledWith(
+                    inviteEvent,
+                    extension.configuration.platforms,
+                    extension.configuration.messageKey);
                 expect(next).toHaveBeenCalled();
                 done();
             });

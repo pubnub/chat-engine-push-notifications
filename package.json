@@ -7,6 +7,8 @@
     "uuid": "^3.2.1"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.4.2",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-builtin-extend": "1.x.x",
     "babel-preset-env": "1.x.x",
