@@ -62,7 +62,7 @@ describe('unittest::CENotificationsExtension', () => {
             expect(extension.notificationToken).toBeNull();
             expect(extension.chatsState).toEqual({});
             expect(extension.configuration.ignoredChats.includes('#read.#feed')).toBeTruthy();
-            expect(extension.configuration.events.includes('$.notifications.seen')).toBeTruthy();
+            expect(extension.configuration.events.includes('$notifications.seen')).toBeTruthy();
             expect(extension.destructing).toBeFalsy();
         });
 
@@ -249,18 +249,18 @@ describe('unittest::CENotificationsExtension', () => {
             extension.construct();
             const registeredEvents = onSpy.mock.calls.map(event => event[0]);
             expect(onSpy.mock.calls).toHaveLength(1);
-            expect(registeredEvents.includes('$.notifications.registered')).toBeTruthy();
-            expect(registeredEvents.includes('$.notifications.received')).toBeFalsy();
+            expect(registeredEvents.includes('$notifications.registered')).toBeTruthy();
+            expect(registeredEvents.includes('$notifications.received')).toBeFalsy();
             onSpy.mockRestore();
         });
 
-        test('should subscribe on \'$.notifications.received\' if markAsSeen is set to true', () => {
+        test('should subscribe on \'$notifications.received\' if markAsSeen is set to true', () => {
             extension.configuration.markAsSeen = true;
             const onSpy = jest.spyOn(extension.notifications, 'on');
             extension.construct();
             const registeredEvents = onSpy.mock.calls.map(event => event[0]);
             expect(onSpy.mock.calls).toHaveLength(2);
-            expect(registeredEvents.includes('$.notifications.received')).toBeTruthy();
+            expect(registeredEvents.includes('$notifications.received')).toBeTruthy();
             onSpy.mockRestore();
         });
 
@@ -396,30 +396,30 @@ describe('unittest::CENotificationsExtension', () => {
         });
 
         test('should be called when \'notifications.markNotificationAsSeen\' is used', () => {
-            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { eid: 'unique' } }, foreground: true };
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
             extension.notifications.markNotificationAsSeen(notification);
             expect(onSpy).toHaveBeenCalled();
             onSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.seen\' event to user\'s direct chat', () => {
-            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+        test('should emit \'$notifications.seen\' event to user\'s direct chat', () => {
+            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { eid: 'unique' } }, foreground: true };
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
             extension.markNotificationAsSeen(notification);
-            expect(onSpy).toHaveBeenCalledWith('$.notifications.seen', { ceid: notification.notification.cepayload.ceid });
+            expect(onSpy).toHaveBeenCalledWith('$notifications.seen', { eid: notification.notification.cepayload.eid });
             onSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.seen\' event on behalf of \'notifications\' instance', () => {
-            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { ceid: 'unique' } }, foreground: true };
+        test('should emit \'$notifications.seen\' event on behalf of \'notifications\' instance', () => {
+            const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { eid: 'unique' } }, foreground: true };
             const onSpy = jest.spyOn(extension.parent.notifications, 'emit');
             extension.markNotificationAsSeen(notification);
-            expect(onSpy).toHaveBeenCalledWith('$.notifications.seen');
+            expect(onSpy).toHaveBeenCalledWith('$notifications.seen');
             onSpy.mockRestore();
         });
 
-        test('should not emit \'$.notifications.seen\' event if \'cepayload\' is missing', () => {
+        test('should not emit \'$notifications.seen\' event if \'cepayload\' is missing', () => {
             const notification = { notification: { aps: { alert: 'PubNub is awesome!' } }, foreground: true };
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
             extension.markNotificationAsSeen(notification);
@@ -427,11 +427,11 @@ describe('unittest::CENotificationsExtension', () => {
             onSpy.mockRestore();
         });
 
-        test('should not emit \'$.notifications.seen\' event if notification not from user interaction or not in foreground', () => {
+        test('should not emit \'$notifications.seen\' event if notification not from user interaction or not in foreground', () => {
             const notification = {
                 notification: {
                     aps: { alert: 'PubNub is awesome!' },
-                    cepayload: { ceid: 'unique' }
+                    cepayload: { eid: 'unique' }
                 },
                 foreground: false,
                 userInteraction: false
@@ -442,7 +442,7 @@ describe('unittest::CENotificationsExtension', () => {
             onSpy.mockRestore();
         });
 
-        test('should not emit \'$.notifications.seen\' event when \'ceid\' is missing', () => {
+        test('should not emit \'$notifications.seen\' event when \'eid\' is missing', () => {
             const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { } }, foreground: true };
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
             extension.markNotificationAsSeen(notification);
@@ -450,9 +450,9 @@ describe('unittest::CENotificationsExtension', () => {
             onSpy.mockRestore();
         });
 
-        test('should not emit \'$.notifications.seen\' event when notification\'s \'event\' is set to \'$.notifications.seen\'', () => {
+        test('should not emit \'$notifications.seen\' event when notification\'s \'event\' is set to \'$notifications.seen\'', () => {
             const notification = {
-                notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { event: '$.notifications.seen' } },
+                notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { event: '$notifications.seen' } },
                 foreground: true
             };
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
@@ -501,17 +501,17 @@ describe('unittest::CENotificationsExtension', () => {
             onSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.seen\' event to user\'s direct chat', () => {
+        test('should emit \'$notifications.seen\' event to user\'s direct chat', () => {
             const onSpy = jest.spyOn(extension.ChatEngine.me.direct, 'emit');
             extension.markAllNotificationAsSeen();
-            expect(onSpy).toHaveBeenCalledWith('$.notifications.seen', { ceid: 'all' });
+            expect(onSpy).toHaveBeenCalledWith('$notifications.seen', { eid: 'all' });
             onSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.seen\' event on behalf of \'notifications\' instance', () => {
+        test('should emit \'$notifications.seen\' event on behalf of \'notifications\' instance', () => {
             const onSpy = jest.spyOn(extension.parent.notifications, 'emit');
             extension.markAllNotificationAsSeen();
-            expect(onSpy).toHaveBeenCalledWith('$.notifications.seen');
+            expect(onSpy).toHaveBeenCalledWith('$notifications.seen');
             onSpy.mockRestore();
         });
     });
@@ -717,7 +717,7 @@ describe('unittest::CENotificationsExtension', () => {
         test('should call formatter on event\'s middleware execution', () => {
             const notificationFormatterSpy = jest.spyOn(extension, 'notificationFormatter').mockImplementation(() => {});
             const middleware = extension.chatMiddlewareExtension();
-            middleware.middleware.emit['$.notifications.seen']();
+            middleware.middleware.emit['$notifications.seen']();
             expect(notificationFormatterSpy).toHaveBeenCalled();
             notificationFormatterSpy.mockRestore();
         });
@@ -743,13 +743,13 @@ describe('unittest::CENotificationsExtension', () => {
             expect(typeof extension.notificationFormatter === 'function').toBeTruthy();
         });
 
-        test('should build notification for \'$.notifications.seen\'', () => {
+        test('should build notification for \'$notifications.seen\'', () => {
             const notification = Object.assign({}, inviteEvent);
             delete notification.data;
             const seenNotificationSpy = jest.spyOn(CENotificationFormatter, 'seenNotification').mockImplementation(() => ({}));
             const normalizedSpy = jest.spyOn(CENotificationFormatter, 'normalized').mockImplementation(() => ({}));
             const next = jest.fn();
-            extension.notificationFormatter('$.notifications.seen', notification, next);
+            extension.notificationFormatter('$notifications.seen', notification, next);
             expect(seenNotificationSpy).toHaveBeenCalled();
             expect(next).toHaveBeenCalled();
             normalizedSpy.mockRestore();
@@ -763,7 +763,7 @@ describe('unittest::CENotificationsExtension', () => {
 
             extension.notificationFormatter(inviteEvent.event, inviteEvent, next);
             const expected = CENotificationFormatter.normalized(inviteEvent, formattedPayload);
-            expected.pn_apns.cepayload.ceid = next.mock.calls[0][1].pn_apns.cepayload.ceid;
+            expected.pn_apns.cepayload.eid = next.mock.calls[0][1].pn_apns.cepayload.eid;
 
             expect(extension.configuration.formatter).toHaveBeenCalledWith(inviteEvent);
             expect(next).toHaveBeenCalledWith(null, expected);
@@ -786,7 +786,7 @@ describe('unittest::CENotificationsExtension', () => {
                 callback(formattedPayload, true);
 
                 const expected = CENotificationFormatter.normalized(inviteEvent, formattedPayload);
-                expected.pn_apns.cepayload.ceid = next.mock.calls[0][1].pn_apns.cepayload.ceid;
+                expected.pn_apns.cepayload.eid = next.mock.calls[0][1].pn_apns.cepayload.eid;
 
                 expect(formatNotificationPayloadSpy).toHaveBeenCalledWith(nativeInvitePayload, expect.any(Function));
                 expect(next).toHaveBeenCalledWith(null, expected);
@@ -803,7 +803,7 @@ describe('unittest::CENotificationsExtension', () => {
                 callback(formattedPayload, true);
 
                 const expected = CENotificationFormatter.normalized(inviteEvent, formattedPayload);
-                expected.pn_apns.cepayload.ceid = next.mock.calls[0][1].pn_apns.cepayload.ceid;
+                expected.pn_apns.cepayload.eid = next.mock.calls[0][1].pn_apns.cepayload.eid;
 
                 expect(formatNotificationPayloadSpy).toHaveBeenCalledWith(nativeInvitePayload, expect.any(Function));
                 expect(next).toHaveBeenCalledWith(null, expected);
@@ -817,7 +817,11 @@ describe('unittest::CENotificationsExtension', () => {
             const next = jest.fn();
             NativeModules.CENNotifications.formatNotificationPayload = jest.fn((nativePayload, callback) => {
                 callback(null, false);
-                expect(notificationsSpy).toHaveBeenCalledWith(inviteEvent, extension.configuration.platforms);
+                expect(notificationsSpy).toHaveBeenCalledWith(
+                    inviteEvent,
+                    extension.configuration.platforms,
+                    extension.configuration.messageKey
+                );
                 expect(next).toHaveBeenCalled();
                 done();
             });
@@ -829,7 +833,11 @@ describe('unittest::CENotificationsExtension', () => {
             const next = jest.fn();
             NativeModules.CENNotifications.formatNotificationPayload = jest.fn((nativePayload, callback) => {
                 callback(null, true);
-                expect(notificationsSpy).toHaveBeenCalledWith(inviteEvent, extension.configuration.platforms);
+                expect(notificationsSpy).toHaveBeenCalledWith(
+                    inviteEvent,
+                    extension.configuration.platforms,
+                    extension.configuration.messageKey
+                );
                 expect(next).toHaveBeenCalled();
                 done();
             });
@@ -854,7 +862,7 @@ describe('unittest::CENotificationsExtension', () => {
             expect(typeof extension.onDeviceRegister === 'function').toBeTruthy();
         });
 
-        test('should be called in response on \'$.notifications.registered\' event', (done) => {
+        test('should be called in response on \'$notifications.registered\' event', (done) => {
             const tokenData = { deviceToken: '00000000000000000000000000000000' };
             const onDeviceRegisterSpy = jest.spyOn(extension, 'onDeviceRegister').mockImplementation(() => {
                 expect(onDeviceRegisterSpy).toHaveBeenCalledWith(tokenData.deviceToken);
@@ -1001,14 +1009,14 @@ describe('unittest::CENotificationsExtension', () => {
             expect(typeof extension.onNotification === 'function').toBeTruthy();
         });
 
-        test('should be called in response on \'$.notifications.received\' event if markAsSeen set to true', () => {
+        test('should be called in response on \'$notifications.received\' event if markAsSeen set to true', () => {
             configuration = Object.assign({ markAsSeen: true }, minimumConfiguration);
             extension = createExtensionWithConfiguration(configuration);
             const notification = { PubNub: 'is awesome!' };
             const onNotificationSpy = jest.spyOn(extension, 'onNotification');
             const markNotificationAsSeenSpy = jest.spyOn(extension.notifications, 'markNotificationAsSeen').mockImplementation(() => ({}));
 
-            extension.notifications.emit('$.notifications.received', notification);
+            extension.notifications.emit('$notifications.received', notification);
 
             expect(onNotificationSpy).toHaveBeenCalledWith(notification);
             expect(markNotificationAsSeenSpy).toHaveBeenCalledWith(notification);
@@ -1016,10 +1024,10 @@ describe('unittest::CENotificationsExtension', () => {
             markNotificationAsSeenSpy.mockRestore();
         });
 
-        test('should not call in response on \'$.notifications.received\' event if markAsSeen set to false', () => {
+        test('should not call in response on \'$notifications.received\' event if markAsSeen set to false', () => {
             const notification = { PubNub: 'is awesome!' };
             const onNotificationSpy = jest.spyOn(extension, 'onNotification');
-            extension.notifications.emit('$.notifications.received', notification);
+            extension.notifications.emit('$notifications.received', notification);
             expect(onNotificationSpy).not.toHaveBeenCalled();
             onNotificationSpy.mockRestore();
         });
@@ -1207,8 +1215,8 @@ describe('unittest::CENotificationsExtension', () => {
             expect(testedConfiguration.ignoredChats).toHaveLength(0);
         });
 
-        test('should not add \'$.notifications.seen\' duplicates into in \'configuration.events\'', () => {
-            const testedConfiguration = { events: ['$.notifications.seen'] };
+        test('should not add \'$notifications.seen\' duplicates into in \'configuration.events\'', () => {
+            const testedConfiguration = { events: ['$notifications.seen'] };
             CENotificationsExtension.applyDefaultConfigurationValues(testedConfiguration);
             CENotificationsExtension.applyDefaultConfigurationValues(testedConfiguration);
             testedConfiguration.events.pop();

@@ -541,11 +541,11 @@ describe('unittest::CENotifications', () => {
             onRegisterSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.registered\' event in response on \'CENRegistered\' event', () => {
+        test('should emit \'$notifications.registered\' event in response on \'CENRegistered\' event', () => {
             const token = { deviceToken: '00000000000000000000000000000000' };
             const emitSpy = jest.spyOn(notifications, 'emit');
             DeviceEventEmitter.emit('CENRegistered', token);
-            expect(emitSpy).toHaveBeenCalledWith('$.notifications.registered', token.deviceToken);
+            expect(emitSpy).toHaveBeenCalledWith('$notifications.registered', token.deviceToken);
             emitSpy.mockRestore();
         });
     });
@@ -568,11 +568,11 @@ describe('unittest::CENotifications', () => {
             onRegistrationFailSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.registration.fail\' event in response on \'CENRegistered\' event', () => {
+        test('should emit \'$notifications.registration.fail\' event in response on \'CENRegistered\' event', () => {
             const error = { message: 'User didn\'t granted notifications usage.' };
             const emitSpy = jest.spyOn(notifications, 'emit');
             DeviceEventEmitter.emit('CENFailedToRegister', error);
-            expect(emitSpy).toHaveBeenCalledWith('$.notifications.registration.fail', error);
+            expect(emitSpy).toHaveBeenCalledWith('$notifications.registration.fail', error);
             emitSpy.mockRestore();
         });
     });
@@ -609,11 +609,11 @@ describe('unittest::CENotifications', () => {
             onNotificationSpy.mockRestore();
         });
 
-        test('should emit \'$.notifications.registration.fail\' event in response on \'CENRegistered\' event', () => {
+        test('should emit \'$notifications.registration.fail\' event in response on \'CENRegistered\' event', () => {
             const notification = { PubNub: ['is', 'awesome!'], action: {} };
             const emitSpy = jest.spyOn(notifications, 'emit');
             DeviceEventEmitter.emit('CENReceivedRemoteNotification', notification);
-            expect(emitSpy).toHaveBeenCalledWith('$.notifications.received', notification);
+            expect(emitSpy).toHaveBeenCalledWith('$notifications.received', notification);
             emitSpy.mockRestore();
         });
 

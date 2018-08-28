@@ -105,7 +105,7 @@ export default class CEPNChatsListView extends React.Component {
      */
     onChatEngineReady() {
         this.setState({ username: CEPNChatsListView.ChatEngine.me.uuid });
-        CEPNChatsListView.ChatEngine.me.notifications.on('$.notifications.received', this._onNotification);
+        CEPNChatsListView.ChatEngine.me.notifications.on('$notifications.received', this._onNotification);
         CEPNChatsListView.ChatEngine.me.notifications.registerNotificationActions({ Accept: 'default', Reject: 'none' });
         CEPNChatsListView.ChatEngine.me.notifications.registerNotificationChannels([
             { id: 'cennotifications', name: 'CENNotifications Channel' }

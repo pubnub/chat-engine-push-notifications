@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_END
 
     UNNotificationContent *notificationContent = notification.request.content;
     NSDictionary *notificationRepresentation = nil;
-    if (notificationContent.userInfo && notificationContent.userInfo[@"ceid"]) {
+    if (notificationContent.userInfo && notificationContent.userInfo[@"eid"]) {
         notificationRepresentation = @{
             @"date": notification.date,
             @"data": @{ @"notification": notificationContent.userInfo, @"foreground": @NO, @"userInteraction": @NO }

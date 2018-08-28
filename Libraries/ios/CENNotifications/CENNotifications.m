@@ -19,7 +19,7 @@ static NSString * const CENReceivedRemoteNotification = @"CENReceivedRemoteNotif
 static NSString * const CENErrorUnableToRequestPermissions = @"E_UNABLE_TO_REQUEST_PERMISSIONS";
 static NSString * const CENErrorUnableToRegisterBecauseOfUserReject = @"E_FAILED_TO_REGISTER_BECAUSE_OF_USER_REJECT";
 
-static NSString * const CENSeenEventName = @"$.notifications.seen";
+static NSString * const CENSeenEventName = @"$notifications.seen";
 
 /**
  * @brief  Stores reference on block which should be used for push notification payload pre-processing.
@@ -433,7 +433,7 @@ RCT_EXPORT_METHOD(deliveredNotifications:(RCTResponseSenderBlock)callback) {
 
     if (@available(iOS 10.0, *)) {
         NSDictionary *chatEngineNotificationPayload = notification[@"notification"][@"cepayload"];
-        NSString *targetNotificationCEID = chatEngineNotificationPayload[@"data"][@"ceid"];
+        NSString *targetNotificationEID = chatEngineNotificationPayload[@"data"][@"eid"];
         UIBackgroundTaskIdentifier backgroundTaskIdentifier = 0;
         if (CENSharedApplication().applicationState != UIApplicationStateActive) {
             backgroundTaskIdentifier = [CENSharedApplication() beginBackgroundTaskWithExpirationHandler:^{
@@ -449,11 +449,11 @@ RCT_EXPORT_METHOD(deliveredNotifications:(RCTResponseSenderBlock)callback) {
                                                         NSUInteger notificationIdx,
                                                         BOOL *notificationsEnumeratorStop) {
                 UNNotificationContent *content = deliveredNotification.request.content;
-                if (content.userInfo && content.userInfo[@"cepayload"] && content.userInfo[@"cepayload"][@"ceid"]) {
-                    if ([content.userInfo[@"cepayload"][@"ceid"] isEqualToString:targetNotificationCEID] ||
-                        [targetNotificationCEID isEqualToString:@"all"]) {
+                if (content.userInfo && content.userInfo[@"cepayload"] && content.userInfo[@"cepayload"][@"eid"]) {
+                    if ([content.userInfo[@"cepayload"][@"eid"] isEqualToString:targetNotificationEID] ||
+                        [targetNotificationEID isEqualToString:@"all"]) {
                         [notificationIdentifiers addObject:deliveredNotification.request.identifier];
-                        *notificationsEnumeratorStop = ![targetNotificationCEID isEqualToString:@"all"];
+                        *notificationsEnumeratorStop = ![targetNotificationEID isEqualToString:@"all"];
                     }
                 }
             }];
@@ -583,7 +583,7 @@ RCT_EXPORT_METHOD(receiveMissedEvents) {
         if (applicationLaunchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
             NSDictionary *remoteNotification = applicationLaunchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
             if (remoteNotification[@"cepayload"]) {
-                onUserAction = [remoteNotification[@"cepayload"][@"ceid"] isEqualToString:userInfo[@"cepayload"][@"ceid"]];
+                onUserAction = [remoteNotification[@"cepayload"][@"eid"] isEqualToString:userInfo[@"cepayload"][@"eid"]];
             }
         }
         NSDictionary *notification = [CENNotifications notification:userInfo
