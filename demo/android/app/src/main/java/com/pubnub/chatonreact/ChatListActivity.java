@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.ReactRootView;
 import com.pubnub.cennotifications.helpers.CENCollections;
@@ -73,10 +75,24 @@ public class ChatListActivity extends CEPNReactActivity {
         CENNotifications.onNotification(this, intent, null);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        if (getIntent() != null)
+            onNewIntent(getIntent());
+    }
+
     void addReactNativeView(ReactRootView reactRootView) {
         setContentView(R.layout.activity_chat_list);
         LinearLayout container = findViewById(R.id.react_native_holder);
-        container.addView(reactRootView);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        container.addView(reactRootView, params);
     }
 
     @Nullable

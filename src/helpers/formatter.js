@@ -64,6 +64,7 @@ export default class CENotificationFormatter {
         }
 
         let chatName = CENotificationFormatter.chatName(eventPayload.chat.channel);
+
         if (chatName === null || chatName === undefined) {
             return {};
         }
@@ -84,6 +85,7 @@ export default class CENotificationFormatter {
             if (chatName === null || chatName === undefined) {
                 return {};
             }
+
             notificationTitle = `Invitation from ${eventPayload.sender}`;
             notificationBody = `${eventPayload.sender} invited you to join '${chatName}'`;
             notificationTicker = 'New invitation to chat';
@@ -101,6 +103,7 @@ export default class CENotificationFormatter {
                         if (TypeValidator.isDefined(notificationCategory)) {
                             notificationPayload.data.category = notificationCategory;
                         }
+
                         if (eventPayload.event === '$.invite') {
                             notificationPayload.data.actions = ['Accept', 'Ignore'];
                         }
@@ -109,6 +112,7 @@ export default class CENotificationFormatter {
                 }
             });
         }
+        
         return notificationsPayload;
     }
 

@@ -52,11 +52,10 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @param {!CEConfiguration} configuration - Push notification registration/handling options.
      * @listens {$notifications.registered} listen event to start push notification management for chat which requested it.
      * @listens {$notifications.received} listen event to mark received notification as `seen` (if `configuration.markAsSeen` is set to `true`).
-     * @listens {$created.chat} listen event to enable push notifications on just created chat if it explicitly not ignored
+     * @listens {$.created.chat} listen event to enable push notifications on just created chat if it explicitly not ignored
      *     (`configuration.ignoredChats`).
-     * @listens {$notifications.connected} listen event to enable push notifications on chat if it explicitly not ignored
+     * @listens {$.connected} listen event to enable push notifications on chat if it explicitly not ignored
      *     (`configuration.ignoredChats`).
-     * @listens {$notifications.disconnected} listen event to disable push notifications on chat.
      * @example <caption>Simple setup</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
@@ -156,8 +155,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         this._onChatCreate = (data, chat) => this.onChatCreate(data, chat);
         /** @type {function(data: Object, chat: Chat)} */
         this._onChatConnect = (data, chat) => this.onChatConnect(data, chat);
-        /** @type {function(data: Object, chat: Chat)} */
-        this._onChatDisconnect = (data, chat) => this.onChatDisconnect(data, chat);
     }
 
     /**
@@ -173,7 +170,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         }
         this.ChatEngine.on('$.created.chat', this._onChatCreate);
         this.ChatEngine.on('$.connected', this._onChatConnect);
-        this.ChatEngine.on('$.disconnected', this._onChatDisconnect);
         Object.keys(this.ChatEngine.chats).forEach(chatChannel => this.onChatCreate({}, this.ChatEngine.chats[chatChannel]));
     }
 
@@ -192,7 +188,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         }
         this.ChatEngine.off('$.created.chat', this._onChatCreate);
         this.ChatEngine.off('$.connected', this._onChatConnect);
-        this.ChatEngine.off('$.disconnected', this._onChatDisconnect);
 
         // Disable push notifications for all previously enabled chats.
         Object.keys(this.chatsState).forEach((channel) => {
@@ -384,6 +379,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
                 } else {
                     formattedPayload = nativeFormattedPayload;
                 }
+
                 next(null, CENotificationFormatter.normalized(payload, formattedPayload));
             });
         } else if (formattedPayload !== null && Object.keys(formattedPayload).length) {
@@ -494,21 +490,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (chat.name === 'Chat' && !this.shouldIgnoreChat(chat)) {
             if (this.canManagePushNotifications(chat)) {
                 this.setPushNotificationState(chat, 'enable');
-            }
-        }
-    }
-
-    /**
-     * Handle disconnection from {@link Chat}.
-     *
-     * @param {Object} data - Reference on object which is passed along with {@link Chat} disconnection `event`.
-     * @param {Chat} chat - Reference on object from which {@link ChatEngine} disconnected.
-     * @private
-     */
-    onChatDisconnect(data, chat) {
-        if (chat.name === 'Chat' && !this.shouldIgnoreChat(chat)) {
-            if (this.canManagePushNotifications(chat)) {
-                this.setPushNotificationState(chat, 'disable');
             }
         }
     }

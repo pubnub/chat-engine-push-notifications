@@ -1,7 +1,16 @@
+react_native_path = '../node_modules/react-native'
 platform :ios, '10.0'
 
 target 'ChatOnReact' do
-    pod 'React', :path => '../node_modules/react-native', :subspecs => [
+    # Explicitly include Yoga if you are using RN >= 0.42.0
+    pod 'yoga', :path => react_native_path + '/ReactCommon/yoga'
+
+    # Third party deps podspec link
+    pod 'DoubleConversion', :podspec => react_native_path + '/third-party-podspecs/DoubleConversion.podspec'
+    pod 'glog', :podspec => react_native_path + '/third-party-podspecs/glog.podspec'
+    pod 'Folly', :podspec => react_native_path + '/third-party-podspecs/Folly.podspec'
+    
+    pod 'React', :path => react_native_path, :subspecs => [
       'Core',
       'CxxBridge',
       'RCTText',
@@ -12,6 +21,6 @@ target 'ChatOnReact' do
       'RCTNetwork',
       'RCTWebSocket'
     ]
-    pod 'yoga', :path => '../node_modules/react-native/ReactCommon/yoga'
-	pod 'CENNotifications', :path => '../node_modules/chat-engine-notifications'
+
+    pod 'CENNotifications', :path => '../node_modules/chat-engine-notifications'
 end
