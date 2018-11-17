@@ -112,7 +112,7 @@ export default class CENotificationFormatter {
                 }
             });
         }
-        
+
         return notificationsPayload;
     }
 
