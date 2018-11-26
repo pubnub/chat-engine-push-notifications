@@ -32,7 +32,7 @@
   },
   "peerDependencies": {
     "chat-engine": "0.9.x",
-    "react-native": "0.55.x",
+    "react-native": "0.57.x",
     "react": "16.x.x"
   },
   "description": "Open Chat Framework Push Notifications support plugin",
@@ -54,7 +54,7 @@
     "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
   },
   "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "test": "jest --ci --forceExit",
     "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=test/unit/",

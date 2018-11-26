@@ -22,6 +22,7 @@ ChatEngine.proto('Me', plugin({
     platforms: { ios: true, android: true},
     ignoredChats: ['chat-engine', '#read.#feed', '#Main', '#Support', '#Docs', '#Foolery'],
     markAsSeen: true,
+    messageKey: 'text'
     formatter
 }));
 ChatEngine.proto('Chat', TypingIndicator({ timeout: 3000 }));

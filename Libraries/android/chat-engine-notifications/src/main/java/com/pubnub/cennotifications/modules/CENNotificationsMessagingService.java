@@ -21,4 +21,13 @@ public class CENNotificationsMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         CENNotifications.onNotification(this, remoteMessage, null);
     }
+
+    @Override
+    public void onNewToken(String registrationToken) {
+        super.onNewToken(registrationToken);
+
+        CENNotificationsHelper.storeRegistrationToken(this, registrationToken);
+        CENNotificationsHelper.Logi("CENNotifications#instanceID: did register device with token: " + registrationToken);
+        CENNotifications.onRegistrationComplete(this, registrationToken);
+    }
 }

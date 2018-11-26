@@ -237,10 +237,9 @@ describe('unittest::CENotificationsExtension', () => {
             const onSpy = jest.spyOn(extension.ChatEngine, 'on');
             extension.construct();
             const registeredEvents = onSpy.mock.calls.map(event => event[0]);
-            expect(onSpy.mock.calls).toHaveLength(3);
+            expect(onSpy.mock.calls).toHaveLength(2);
             expect(registeredEvents.includes('$.created.chat')).toBeTruthy();
             expect(registeredEvents.includes('$.connected')).toBeTruthy();
-            expect(registeredEvents.includes('$.disconnected')).toBeTruthy();
             onSpy.mockRestore();
         });
 
@@ -1132,64 +1131,6 @@ describe('unittest::CENotificationsExtension', () => {
             extension.ChatEngine.emit('$.connected', {}, remoteDirect);
 
             expect(extension.chatsState[remoteDirect.channel].states[0]).not.toBe('enable');
-        });
-    });
-
-    describe('#onChatDisconnect', () => {
-        const chat = {
-            channel: 'chat1',
-            plugin: jest.fn(),
-            name: 'Chat',
-            plugins: []
-        };
-
-        beforeEach(() => {
-            extension.chatsState = { chat1: { states: ['created'], errorCount: 0 } };
-            extension.ChatEngine.chats = { chat1: chat };
-        });
-
-        afterEach(() => extension.notifications.destruct());
-
-        test('should be function', () => {
-            expect(typeof extension.onChatDisconnect === 'function').toBeTruthy();
-        });
-
-        test('should be called in response on \'$.disconnected\' event', () => {
-            const onChatDisconnectSpy = jest.spyOn(extension, 'onChatDisconnect');
-
-            extension.ChatEngine.emit('$.disconnected', {}, chat);
-
-            expect(onChatDisconnectSpy).toHaveBeenCalledWith({}, chat);
-            onChatDisconnectSpy.mockRestore();
-        });
-
-        test('should not proceed for non Chat object', () => {
-            const shouldIgnoreChatSpy = jest.spyOn(extension, 'shouldIgnoreChat');
-
-            extension.ChatEngine.emit('$.disconnected', {}, new Error('Test error'));
-
-            expect(shouldIgnoreChatSpy).not.toHaveBeenCalled();
-            shouldIgnoreChatSpy.mockRestore();
-        });
-
-        test('should not proceed for ignored chats', () => {
-            const ignoredChat = Object.assign({}, chat, { channel: '#read.#feed' });
-            const canManagePushNotificationsSpy = jest.spyOn(extension, 'canManagePushNotifications');
-
-            extension.ChatEngine.emit('$.disconnected', {}, ignoredChat);
-
-            expect(canManagePushNotificationsSpy).not.toHaveBeenCalled();
-            canManagePushNotificationsSpy.mockRestore();
-        });
-
-        test('should not request notifications state change for restricted chats (direct for non-local user)', () => {
-            const remoteState = extension.chatsState[chat.channel];
-            const remoteDirect = Object.assign({}, chat, { channel: 'chat-engine#user#pubnub#write.#direct' });
-            extension.chatsState[remoteDirect.channel] = remoteState;
-
-            extension.ChatEngine.emit('$.disconnected', {}, remoteDirect);
-
-            expect(extension.chatsState[remoteDirect.channel].states[0]).not.toBe('disable');
         });
     });
 

@@ -9,8 +9,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.ReactRootView;
 import com.pubnub.cennotifications.helpers.CENCollections;
@@ -42,7 +44,13 @@ public class ChatActivity extends CEPNReactActivity {
     void addReactNativeView(ReactRootView reactRootView) {
         setContentView(R.layout.activity_chat);
         LinearLayout container = findViewById(R.id.react_native_holder);
-        container.addView(reactRootView);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        container.addView(reactRootView, params);
 
         Typeface materialIcons = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/SimpleLineIcons.ttf");
         Toolbar toolbar = findViewById(R.id.toolbar);
