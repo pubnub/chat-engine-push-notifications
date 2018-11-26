@@ -65,3 +65,6 @@ ChatOnReact.xcworkspace
 *.xcuserdata
 Podfile.lock
 Pods
+
+# OS
+.DS_Store

@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.ReactRootView;
 
@@ -30,7 +32,13 @@ public class CreateChatActivity extends CEPNReactActivity {
     void addReactNativeView(ReactRootView reactRootView) {
         setContentView(R.layout.activity_create_chat);
         LinearLayout container = findViewById(R.id.react_native_holder);
-        container.addView(reactRootView);
+
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        );
+
+        container.addView(reactRootView, params);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         Button cancelButton = new Button(this);

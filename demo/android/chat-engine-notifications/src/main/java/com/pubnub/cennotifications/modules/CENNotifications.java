@@ -476,6 +476,7 @@ public class CENNotifications extends ReactContextBaseJavaModule {
                 return;
 
         }
+
         onNotification(context, payload, sender, action, false);
     }
 

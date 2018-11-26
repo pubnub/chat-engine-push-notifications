@@ -325,7 +325,7 @@ public class CENCollections {
         else if (object instanceof List || isJavaArray(object) || object instanceof JSONArray ||
             object instanceof ReadableArray)
             return writableArrayFrom(object);
-        else
+        else if (object != null)
             Loge("Unable to convert passed object to one of WritableMap or WritableArray.", null);
 
         return null;
@@ -367,7 +367,7 @@ public class CENCollections {
                     Loge("Unable to get value for " + key + " from JSONObject.", exception);
                 }
             }
-        } else
+        } else if (object != null)
             Loge("Unable to convert passed object to WritableArray", null);
 
         return writableMap;
@@ -437,7 +437,7 @@ public class CENCollections {
             }
         } else if (isJavaArray(object))
             writableArray = writableArrayFrom(listFrom(object));
-        else
+        else if (object != null)
             Loge("Unable to convert passed object to WritableArray", null);
 
         return writableArray;
@@ -501,7 +501,7 @@ public class CENCollections {
             }
         } else if (object instanceof ReadableArray)
             return toJSONArray(((ReadableArray) object).toArrayList());
-        else
+        else if (object != null)
             Loge("Unable to convert passed object to JSONArray.", null);
 
         return null;
@@ -528,7 +528,7 @@ public class CENCollections {
             return toJSONObject(mapFrom(object));
         else if (object instanceof ReadableMap)
             return toJSONObject(((ReadableMap) object).toHashMap());
-        else
+        else if (object != null)
             Loge("Unable to convert passed object to JSONObject.", null);
 
         return null;

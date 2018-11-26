@@ -5,8 +5,7 @@ group = 'com.pubnub.chat-engine'
 version = '1.0.7'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 16
@@ -27,14 +26,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.google.firebase:firebase-core:11.+'
-    compile 'com.google.firebase:firebase-messaging:11.+'
-    compile "me.leolin:ShortcutBadger:1.1.19@aar"
-    compile "com.facebook.react:react-native:+"
-    provided 'javax.annotation:jsr250-api:1.0'
-    compile "org.projectlombok:lombok:1.16.18"
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.google.firebase:firebase-core:16.0.5'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation "me.leolin:ShortcutBadger:1.1.19@aar"
+    implementation "com.facebook.react:react-native:+"
+    compileOnly 'javax.annotation:jsr250-api:1.0'
+    implementation "org.projectlombok:lombok:1.16.18"
+    annotationProcessor 'org.projectlombok:lombok:1.16.18'
 }
 
 uploadArchives {
