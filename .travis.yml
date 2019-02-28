@@ -5,7 +5,7 @@ node_js:
   - '9'
 cache: yarn
 install:
-  - npm i chat-engine react-native
+  - npm i chat-engine react-native react acorn
   - npm i
 script:
   - gulp test

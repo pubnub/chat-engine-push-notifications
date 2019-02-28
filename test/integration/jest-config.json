@@ -8,8 +8,14 @@
     "lcov",
     "clover"
   ],
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/test/",
+    "<rootDir>/demo/",
+    "<rootDir>/node_modules/"
+  ],
   "modulePathIgnorePatterns": [
     "<rootDir>/demo",
+    "<rootDir>/node_modules/(?!react|fbjs|react-native|react-transform-hmr|core-js|promise)/",
     "<rootDir>/node_modules/react-native/Libraries/react-native/"
   ],
   "testPathIgnorePatterns": [
@@ -17,6 +23,7 @@
     "<rootDir>/Libraries",
     "<rootDir>/coverage",
     "<rootDir>/docs",
+    "<rootDir>/node_modules/",
     "/node_modules/"
   ],
   "notify": true,

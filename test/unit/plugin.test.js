@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
+/* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor,import/named */
 /* global test, expect */
 import { TypeValidator } from '../../src/helpers/utils';
 import { plugin } from '../../src/plugin';
@@ -29,7 +29,7 @@ describe('unittest::plugin', () => {
         });
 
         test('should export plugin', () => {
-            expect(require('../../src/plugin').CENotificationAction).toBeDefined();
+            expect(require('../../src/plugin').plugin).toBeDefined();
         });
 
         test('should return proper plugin object', () => {

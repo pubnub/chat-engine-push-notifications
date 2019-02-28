@@ -1,5 +1,6 @@
 /**
  * @file File contain only @typedefs for ChatEngine module, so there is no need to import it.
+ *
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
 
@@ -18,7 +19,6 @@
  * @typedef {Object} Me
  * @extends {User}
  * @property {Chat} direct - Reference on chat which can be used to send direct messages and events to current {@link ChatEngine} user.
- * @property {Object.<String, Chat>} chats - Map of chats in which user currently participate.
  */
 
 /**
@@ -26,13 +26,14 @@
  *
  * @typedef {Object} User
  * @property {String} uuid - Reference on identifier which has been provided by remote user during authorization process.
- * @property {Object.<String, Chat>} chats - Map of chats in which user currently participate.
+ * @property {ChatEngine} chatEngine - ChatEngine instance which created user instance.
  * @property {function(plugin: Object)} plugin - Plugin registration function.
  */
 
 /**
  * @typedef {Object} Chat
  * @property {String} channel - Reference on name of channel which is used for real-time communication using PubNub service.
+ * @property {Array<Object>} plugins - List of plugins which has been registered on chat.
  * @property {function(plugin: Object)} plugin - Plugin registration function.
  */
 
@@ -43,5 +44,5 @@
  * @property {Chat} chat - Reference on {@link Chat} instance for which event has been emitted.
  * @property {String} event - Name of emitted event.
  * @property {String} sender - Reference on {@link Event} sender identifier (user which asked to emit this {@link Event})
- * @property {Object} data - Reference on data which has been sent along with emitted {@link Event}.
+ * @property {?Object} data - Reference on data which has been sent along with emitted {@link Event}.
  */

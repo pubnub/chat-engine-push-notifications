@@ -1,51 +1,12 @@
 {
+  "name": "chat-engine-notifications",
+  "description": "ChatEngine Push Notifications support plugin",
+  "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
+  "version": "1.1.1",
+  "license": "MIT",
   "author": {
     "name": "Serhii Mamontov <sergey@pubnub.com>"
   },
-  "dependencies": {
-    "eventemitter2": "^4.1.2",
-    "uuid": "^3.2.1"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-jest": "^23.4.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-builtin-extend": "1.x.x",
-    "babel-preset-env": "1.x.x",
-    "babel-preset-react-native": "4.x.x",
-    "babel-register": "^6.26.0",
-    "esdoc": "1.x.x",
-    "esdoc-node": "1.x.x",
-    "esdoc-standard-plugin": "1.x.x",
-    "eslint": "4.x.x",
-    "eslint-config-airbnb": "16.x.x",
-    "eslint-plugin-import": "2.x.x",
-    "eslint-plugin-jsx-a11y": "6.x.x",
-    "eslint-plugin-react": "7.x.x",
-    "gulp": "3.x.x",
-    "gulp-eslint": "4.x.x",
-    "gulp-shell": "0.6.x",
-    "jest": "21.x.x",
-    "jest-cli": "21.x.x",
-    "regenerator-runtime": "0.11.x",
-    "run-sequence": "^2.2.x"
-  },
-  "peerDependencies": {
-    "chat-engine": "0.9.x",
-    "react-native": "0.57.x",
-    "react": "16.x.x"
-  },
-  "description": "Open Chat Framework Push Notifications support plugin",
-  "keywords": [
-    "pubnub",
-    "chat",
-    "sdk",
-    "realtime",
-    "notifications"
-  ],
-  "license": "MIT",
-  "main": "src/plugin.js",
-  "name": "chat-engine-notifications",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pubnub/chat-engine-push-notifications.git"
@@ -53,12 +14,42 @@
   "bugs": {
     "url": "https://github.com/pubnub/chat-engine-push-notifications/issues"
   },
-  "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.1.1",
+  "main": "src/plugin.js",
   "scripts": {
-    "test": "jest --ci --forceExit",
+    "test": "jest --ci --forceExit --detectOpenHandles",
     "unit_test": "jest --ci --forceExit --config=test/unit/jest-config.json --testPathPattern=test/unit/",
     "integration_test": "jest --ci --forceExit --config=test/integration/jest-config.json --testPathPattern=test/integration/"
+  },
+  "dependencies": {
+    "eventemitter2": "^4.1.2",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/preset-env": "^7.3.1",
+    "acorn": "^6.0.6",
+    "babel-jest": "^24.0.0",
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-preset-react-native": "^4.0.1",
+    "babel-register": "^6.26.0",
+    "eslint": "^5.13.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0",
+    "eslint-plugin-react": "^7.12.4",
+    "gulp": "3.x.x",
+    "gulp-eslint": "^5.0.0",
+    "gulp-shell": "^0.6.5",
+    "jest": "^24.0.0",
+    "jest-cli": "^24.0.0",
+    "metro-react-native-babel-preset": "^0.51.1"
+  },
+  "peerDependencies": {
+    "chat-engine": "0.9.x",
+    "react-native": "0.57.x",
+    "react": "16.x.x"
   },
   "jest": {
     "collectCoverage": true,
@@ -71,10 +62,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 100,
-        "functions": 100,
-        "lines": 100,
-        "statements": 100
+        "branches": 95,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
       }
     },
     "coveragePathIgnorePatterns": [
@@ -84,6 +75,7 @@
     ],
     "modulePathIgnorePatterns": [
       "<rootDir>/demo/",
+      "<rootDir>/node_modules/(?!react|fbjs|react-native|react-transform-hmr|core-js|promise)/",
       "<rootDir>/node_modules/react-native/Libraries/react-native/"
     ],
     "testPathIgnorePatterns": [
@@ -92,9 +84,17 @@
       "<rootDir>/coverage/",
       "<rootDir>/docs/",
       "<rootDir>/demo/",
-      "<rootDir>/node_modules/"
+      "<rootDir>/node_modules/",
+      "/node_modules/"
     ],
     "notify": true,
     "preset": "react-native"
-  }
+  },
+  "keywords": [
+    "pubnub",
+    "chat",
+    "sdk",
+    "realtime",
+    "notifications"
+  ]
 }

@@ -71,29 +71,43 @@ export default class CENotificationAction {
         if (!TypeValidator.sequence(options.identifier, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).'));
             return false;
-        } else if (!TypeValidator.sequence(options.title, [['isTypeOf', String], 'notEmpty'])) {
+        }
+
+        if (!TypeValidator.sequence(options.title, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected title: empty or has unexpected data type (string expected).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.activationMode, [['isOneOf', ['foreground', 'background']]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.activationMode, [['isOneOf', ['foreground', 'background']]])) {
             throwError(new TypeError('Unexpected activation mode: empty or has unknown value (known: foreground and background).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.authenticationRequired, [['isTypeOf', Boolean]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.authenticationRequired, [['isTypeOf', Boolean]])) {
             throwError(new TypeError('Unexpected authentication: unexpected data type (boolean expected).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.destructive, [['isTypeOf', Boolean]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.destructive, [['isTypeOf', Boolean]])) {
             throwError(new TypeError('Unexpected destructive: unexpected data type (boolean expected).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.behavior, [['isOneOf', ['default', 'textInput']]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.behavior, [['isOneOf', ['default', 'textInput']]])) {
             throwError(new TypeError('Unexpected behavior: empty or has unknown value (known: default and textInput).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.textInput, [['isTypeOf', Object], ['hasKnownKeys', ['title', 'placeholder']],
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.textInput, [['isTypeOf', Object], ['hasKnownKeys', ['title', 'placeholder']],
             ['hasValuesOf', String]])) {
             throwError(new TypeError('Unexpected text input: empty or has unknown parameters (known: title and placeholder) of unknown data type.'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.options, [['isTypeOf', Object],
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.options, [['isTypeOf', Object],
             ['hasKnownKeys', ['authenticationRequired', 'destructive', 'foreground']], ['hasValuesOf', Boolean]])) {
-            throwError(new TypeError('Unexpected options: empty or has unknown parameters (known: authenticationRequired, destructive and foreground) ' +
-                'of unknown data type.'));
+            throwError(new TypeError('Unexpected options: empty or has unknown parameters (known: authenticationRequired, destructive and foreground) '
+              + 'of unknown data type.'));
             return false;
         }
         return true;

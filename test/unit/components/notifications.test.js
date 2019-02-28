@@ -6,13 +6,13 @@ import CENInvitationNotificationCategory from '../../../src/models/invitation-no
 import CENotifications from '../../../src/components/notifications';
 import { TypeValidator } from '../../../src/helpers/utils';
 
-
 jest.mock('NativeModules', () => ({
     CENNotifications: {}
 }));
 
 /** @test {CENotifications} */
 describe('unittest::CENotifications', () => {
+
     test('should be instance of EventEmitter2', () => {
         expect(TypeValidator.isTypeOf(new CENotifications(), EventEmitter2)).toBeTruthy();
     });
@@ -41,9 +41,14 @@ describe('unittest::CENotifications', () => {
             expect(notifications.destructing).toBeFalsy();
         });
 
-        test('should request missed events', () => {
+        test('should request missed events', (done) => {
             new CENotifications();
-            expect(NativeModules.CENNotifications.receiveMissedEvents).toHaveBeenCalled();
+
+            setTimeout(() => {
+                expect(NativeModules.CENNotifications.receiveMissedEvents).toHaveBeenCalled();
+                done();
+            }, 2000);
+
         });
 
         test('should subscribe on native module notifications', () => {
@@ -72,7 +77,7 @@ describe('unittest::CENotifications', () => {
         test('should ignore events from native module', () => {
             notifications.destruct();
             const onRegisterSpy = jest.spyOn(notifications, 'onRegister');
-            DeviceEventEmitter.emit('CENRegistered', { deviceToken: '00000000000000000000000000000000' });
+            DeviceEventEmitter.emit('CENRegistered', { deviceToken: '0000000000000000000000000000000000000000000000000000000000000000' });
             expect(onRegisterSpy).not.toHaveBeenCalled();
             onRegisterSpy.mockRestore();
         });
@@ -204,32 +209,35 @@ describe('unittest::CENotifications', () => {
             Platform.OS = originalPlatform;
         });
 
-        test('should throw TypeError when \'permissions\' is not type of Object', () =>
+        test('should throw TypeError when \'permissions\' is not type of Object', () => {
             notifications.requestPermissions('')
                 .then(() => expect(false).toBeTruthy())
-                .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/)));
+                .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/));
+        });
 
-        test('should throw TypeError when \'permissions\' is Object with unknown keys', () => notifications.requestPermissions({ PubNub: 'is cool!' })
-            .then(() => expect(false).toBeTruthy())
-            .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/)));
+        test('should throw TypeError when \'permissions\' is Object with unknown keys', () => {
+            notifications.requestPermissions({ PubNub: 'is cool!' })
+                .then(() => expect(false).toBeTruthy())
+                .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/));
+        });
 
-        test('should throw TypeError when \'permissions\' is Object with non Boolean value', () =>
+        test('should throw TypeError when \'permissions\' is Object with non Boolean value', () => {
             notifications.requestPermissions({ alert: 'PubNub' })
                 .then(() => expect(false).toBeTruthy())
-                .catch(exception =>
-                    expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/)));
+                .catch(exception => expect(exception.message).toMatch(/Unexpected permissions: empty or has unexpected data type \(object expected\)/));
+        });
 
-        test('should throw TypeError when \'categories\' is not type of Array', () =>
+        test('should throw TypeError when \'categories\' is not type of Array', () => {
             notifications.requestPermissions({ alert: true }, 'PubNub')
                 .then(() => expect(false).toBeTruthy())
-                .catch(exception =>
-                    expect(exception.message).toMatch(/Unexpected values type \(array expected\)/)));
+                .catch(exception => expect(exception.message).toMatch(/Unexpected values type \(array expected\)/));
+        });
 
-        test('should throw TypeError when any entry of \'categories\' has unexpected data type', () =>
+        test('should throw TypeError when any entry of \'categories\' has unexpected data type', () => {
             notifications.requestPermissions({ alert: true }, ['PubNub'])
                 .then(() => expect(false).toBeTruthy())
-                .catch(exception =>
-                    expect(exception.message).toMatch(/Unexpected categories: unexpected categories entry data type/)));
+                .catch(exception => expect(exception.message).toMatch(/Unexpected categories: unexpected categories entry data type/));
+        });
 
         test('should throw forward thrown Error', () => {
             NativeModules.CENNotifications.requestPermissions = jest.fn(() => { throw new Error('Test Error'); });
@@ -534,7 +542,7 @@ describe('unittest::CENotifications', () => {
         });
 
         test('should be called in response on \'CENRegistered\' event', () => {
-            const token = { deviceToken: '00000000000000000000000000000000' };
+            const token = { deviceToken: '0000000000000000000000000000000000000000000000000000000000000000' };
             const onRegisterSpy = jest.spyOn(notifications, 'onRegister');
             DeviceEventEmitter.emit('CENRegistered', token);
             expect(onRegisterSpy).toHaveBeenCalledWith(token);
@@ -542,7 +550,7 @@ describe('unittest::CENotifications', () => {
         });
 
         test('should emit \'$notifications.registered\' event in response on \'CENRegistered\' event', () => {
-            const token = { deviceToken: '00000000000000000000000000000000' };
+            const token = { deviceToken: '0000000000000000000000000000000000000000000000000000000000000000' };
             const emitSpy = jest.spyOn(notifications, 'emit');
             DeviceEventEmitter.emit('CENRegistered', token);
             expect(emitSpy).toHaveBeenCalledWith('$notifications.registered', token.deviceToken);
