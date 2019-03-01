@@ -8,10 +8,5 @@ module.exports = {
         'add-module-exports',
         '@babel/plugin-proposal-class-properties',
         ['babel-plugin-transform-builtin-extend', { globals: ['Error', 'Array'] }]],
-    sourceMaps: true,
-    env: {
-        test: {
-            plugins: ['istanbul']
-        }
-    }
+    sourceMaps: true
 };
