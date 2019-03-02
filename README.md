@@ -542,3 +542,7 @@ notifications from device's notifications center.
        ```
        We user `cennotifications` for channel name and also use it in example with 
        `registerNotificationChannels()` function call.
+
+## Support
+
+- If you **need help**, have a **general question** a **feature request** or to file a **bug**, contact <support@pubnub.com>
