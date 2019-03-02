@@ -1,6 +1,7 @@
 /**
  * @file File contain only @typedefs which help IDE to figure out what passed object is and provide auto-completion if it recognized. This file also
  * used during documentation generation and allow keep documentation notes in code cleaner.
+ *
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
 
@@ -9,11 +10,8 @@
  *
  * @typedef {Object} CEConfiguration
  * @property {!String[]} events - List of events for which push notification payload should be created.
- * @property {String[]} [ignoredChats='#read.#feed'] - List of chats for which it is not required to register on push notifications.
  * @property {String} [messageKey='message'] - Name of key under which stored published message, which should be handled by default formatter.
  * @property {!CEPlatforms} platforms Available platforms for push notification should be constructed when {@link ChatEngine} send events.
- * @property {Boolean} [markAsSeen=true] - Whether received notification should be marked as `seen` or not when received (when `$notification` event
- *     is sent).
  * @property {CEFormatterCallback} [formatter] - Called each time when {@link ChatEngine} is about to send one of tracked `events` make layout
  *     formatting for notification.
  */
@@ -100,14 +98,4 @@
  * @typedef {Object} NotificationTextInputActionConfiguration
  * @property {String} title - Send button title.
  * @property {String} placeholder - Text input field placeholder message.
- */
-
-/**
- * Observed chat information.
- *
- * @typedef {Object} ObservedChatData
- * @property {String[]} states - Current observed {@link Chat} states (there can be two in case if additional change has been requested when another
- *     request was active).
- * @property {Number} errorCount - Stores how many times {@link Chat} state change failed.
- * @private
  */
