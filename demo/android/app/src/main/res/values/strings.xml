@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">ChatOnReact</string>
-    <string name="title_chat_detail">Chat Detail</string>
-    <string name="default_notification_channel_id">cennotifications</string>
-</resources>

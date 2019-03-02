@@ -10,14 +10,20 @@
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 100,
-      "functions": 100,
-      "lines": 100,
-      "statements": 100
+      "branches": 90,
+      "functions": 90,
+      "lines": 90,
+      "statements": 90
     }
   },
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/test/",
+    "<rootDir>/demo/",
+    "<rootDir>/node_modules/"
+  ],
   "modulePathIgnorePatterns": [
     "<rootDir>/demo",
+    "<rootDir>/node_modules/(?!react|fbjs|react-native|react-transform-hmr|core-js|promise)/",
     "<rootDir>/node_modules/react-native/Libraries/react-native/"
   ],
   "testPathIgnorePatterns": [
@@ -25,6 +31,7 @@
     "<rootDir>/Libraries",
     "<rootDir>/coverage",
     "<rootDir>/docs",
+    "<rootDir>/node_modules/",
     "/node_modules/"
   ],
   "notify": true,

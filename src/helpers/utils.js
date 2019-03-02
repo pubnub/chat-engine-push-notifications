@@ -91,9 +91,13 @@ export class TypeValidator {
         if (TypeValidator.isDefined(value)) {
             if (TypeValidator.isTypeOf(value, String) || Array.isArray(value)) {
                 return value.length === 0;
-            } else if (TypeValidator.isTypeOf(value, Number)) {
+            }
+
+            if (TypeValidator.isTypeOf(value, Number)) {
                 return value === 0;
-            } else if (typeof value === 'object') {
+            }
+
+            if (typeof value === 'object') {
                 return Object.keys(value).length === 0;
             }
         }
@@ -237,8 +241,8 @@ export class TypeValidator {
             let ObjProto = Object.prototype;
             if (ObjProto.toString.call(value) === '[object Object]' && TypeValidator.isTypeOf(value.constructor, 'function')) {
                 let proto = value.constructor.prototype;
-                return !TypeValidator.isPrimitive(proto) && !Array.isArray(proto) && ObjProto.toString.call(proto) === '[object Object]' &&
-                    ObjProto.hasOwnProperty.call(proto, 'isPrototypeOf');
+                return !TypeValidator.isPrimitive(proto) && !Array.isArray(proto) && ObjProto.toString.call(proto) === '[object Object]'
+                  && ObjProto.hasOwnProperty.call(proto, 'isPrototypeOf');
             }
         }
         return false;

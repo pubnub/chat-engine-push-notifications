@@ -168,7 +168,7 @@ export default class CENotificationFormatter {
             chat: eventPayload.chat.channel,
             event: eventPayload.event,
             data: eventPayload.data,
-            eid: uuidv4(),
+            eid: eventPayload.eid || uuidv4(),
             category
         };
 
@@ -218,16 +218,24 @@ export default class CENotificationFormatter {
         if (!TypeValidator.isDefined(payload) || !TypeValidator.sequence(payload, [['isTypeOf', Object], 'notEmpty'])) {
             throwError(new TypeError('Unexpected payload: not defined or has unexpected type (Object expected).'));
             return false;
-        } else if (!TypeValidator.isDefined(payload.chat) || TypeValidator.isTypeOf(payload.chat, String)) {
+        }
+
+        if (!TypeValidator.isDefined(payload.chat) || TypeValidator.isTypeOf(payload.chat, String)) {
             throwError(new TypeError('Unexpected chat: not defined or has unexpected type (Chat instance expected).'));
             return false;
-        } else if (!TypeValidator.isDefined(payload.event) || !TypeValidator.sequence(payload.event, [['isTypeOf', String], 'notEmpty'])) {
+        }
+
+        if (!TypeValidator.isDefined(payload.event) || !TypeValidator.sequence(payload.event, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected event: empty or has unexpected type (string expected).'));
             return false;
-        } else if (!TypeValidator.isDefined(payload.sender) || !TypeValidator.sequence(payload.sender, [['isTypeOf', String], 'notEmpty'])) {
+        }
+
+        if (!TypeValidator.isDefined(payload.sender) || !TypeValidator.sequence(payload.sender, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected sender: empty or has unexpected type (string expected).'));
             return false;
-        } else if (!TypeValidator.isDefined(payload.data) || !TypeValidator.isTypeOf(payload.data, Object)) {
+        }
+
+        if (!TypeValidator.isDefined(payload.data) || !TypeValidator.isTypeOf(payload.data, Object)) {
             throwError(new TypeError('Unexpected data: empty or has unexpected type (object expected).'));
             return false;
         }
