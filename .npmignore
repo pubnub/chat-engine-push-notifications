@@ -1,8 +1,10 @@
+node_modules
 coverage
 demo
+docs
 test
-.babelrc
-.eslintrc
 .travis.yml
-package-lock.json
+.eslintrc
 gulpfile.babel.js
+package-lock.json
+babel.config.js

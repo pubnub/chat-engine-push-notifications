@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor */
+/* eslint-disable no-unused-expressions,no-new,no-new-wrappers,no-new-object,no-array-constructor,import/named */
 /* global test, expect, jasmine */
 import ChatEngineCore from 'chat-engine';
 import { plugin } from '../../src/plugin';
@@ -23,27 +23,28 @@ describe('integration::ChatEngineCore', () => {
     });
 
     test('should register proto plugin', () => {
-        let ignoredChats = ['chat-engine', 'Main', 'Support', 'Docs', 'Foolery'];
-        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true } }));
         expect(chatEngine.protoPlugins.Me.length).toBeGreaterThan(0);
     });
 });
 
 describe('integration::ChatEngineNotifications', () => {
-    const ignoredChats = ['chat-engine', 'Main', 'Support', 'Docs', 'Foolery'];
     let chatEngine;
 
     beforeEach(() => {
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
         chatEngine = ChatEngineCore.create({ publishKey: process.env.PUBLISH_KEY, subscribeKey: process.env.SUBSCRIBE_KEY });
+        chatEngine.on('$.error.*', (error) => {
+            console.log('ERROR:', error);
+        });
     });
 
     afterEach(() => {
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = 7000;
     });
 
     test('should add \'notifications\' property to Me', (done) => {
-        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true } }));
         chatEngine.on('$.ready', () => {
             expect(chatEngine.me.notifications).toBeDefined();
             jest.clearAllTimers();
@@ -52,23 +53,13 @@ describe('integration::ChatEngineNotifications', () => {
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
-    test('should add middleware to Me\'s #write.#direct chat', (done) => {
-        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
-        chatEngine.on('$.ready', () => {
-            expect(chatEngine.me.direct.plugins.length).toBeGreaterThan(0);
-            jest.clearAllTimers();
-            done();
-        });
-        chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
-    });
-
     test('should use user-provided formatter with no notification appending ({} returned from formatter)', (done) => {
+        const deviceToken = '0000000000000000000000000000000000000000000000000000000000000000';
         const formatter = () => ({});
         let messageReceived = false;
         chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
-            ignoredChats,
             formatter
         }));
         chatEngine.on('$.ready', () => {
@@ -80,8 +71,14 @@ describe('integration::ChatEngineNotifications', () => {
                 jest.clearAllTimers();
                 done();
             };
-            const connectionHandler = () => {
-                chatEngine.me.direct.off('$.connected', connectionHandler);
+
+            const registrationCompletionHandler = (error) => {
+                if (error) {
+                    jest.clearAllTimers();
+                    done();
+                    return;
+                }
+
                 chatEngine.me.direct.on('message', messageHandler);
                 chatEngine.me.direct.emit('message', { message: 'For chat' });
                 let retryInterval = setInterval(() => {
@@ -92,22 +89,29 @@ describe('integration::ChatEngineNotifications', () => {
                     }
                 }, 100);
             };
+
+            const connectionHandler = () => {
+                chatEngine.me.direct.off('$.connected', connectionHandler);
+                chatEngine.me.notifications.enable([chatEngine.me.direct], deviceToken, registrationCompletionHandler);
+            };
+
             if (!chatEngine.me.direct.connected) {
                 chatEngine.me.direct.on('$.connected', connectionHandler);
             } else {
                 connectionHandler();
             }
         });
+
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
     });
 
     test('should use user-provided formatter to append push notification to published message', (done) => {
         const formatter = () => ({ apns: { aps: { alert: 'Title from formatted function #1' } } });
+        const deviceToken = '0000000000000000000000000000000000000000000000000000000000000000';
         let messageReceived = false;
         chatEngine.proto('Me', plugin({
             events: ['$.invite', 'message'],
             platforms: { ios: true, android: true },
-            ignoredChats,
             formatter
         }));
         chatEngine.on('$.ready', () => {
@@ -125,8 +129,14 @@ describe('integration::ChatEngineNotifications', () => {
                 jest.clearAllTimers();
                 done();
             };
-            const connectionHandler = () => {
-                chatEngine.me.direct.off('$.connected', connectionHandler);
+
+            const registrationCompletionHandler = (error) => {
+                if (error) {
+                    jest.clearAllTimers();
+                    done();
+                    return;
+                }
+
                 chatEngine.me.direct.on('message', messageHandler);
                 chatEngine.me.direct.emit('message', { message: 'For chat' });
                 let retryInterval = setInterval(() => {
@@ -136,6 +146,11 @@ describe('integration::ChatEngineNotifications', () => {
                         clearInterval(retryInterval);
                     }
                 }, 500);
+            };
+
+            const connectionHandler = () => {
+                chatEngine.me.direct.off('$.connected', connectionHandler);
+                chatEngine.me.notifications.enable([chatEngine.me.direct], deviceToken, registrationCompletionHandler);
             };
             if (!chatEngine.me.direct.connected) {
                 chatEngine.me.direct.on('$.connected', connectionHandler);
@@ -147,7 +162,8 @@ describe('integration::ChatEngineNotifications', () => {
     });
 
     test('should use default formatter for $.invite', (done) => {
-        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true } }));
+        const deviceToken = '0000000000000000000000000000000000000000000000000000000000000000';
         let inviteReceived = false;
         chatEngine.on('$.ready', () => {
             const chat = new chatEngine.Chat('secret-meeting');
@@ -162,8 +178,14 @@ describe('integration::ChatEngineNotifications', () => {
                 jest.clearAllTimers();
                 done();
             };
-            const connectionHandler = () => {
-                chat.off('$.connected', connectionHandler);
+
+            const registrationCompletionHandler = (error) => {
+                if (error) {
+                    jest.clearAllTimers();
+                    done();
+                    return;
+                }
+
                 chatEngine.me.direct.on('$.invite', invitationHandler);
                 chat.invite(chatEngine.me);
                 let retryInterval = setInterval(() => {
@@ -174,6 +196,11 @@ describe('integration::ChatEngineNotifications', () => {
                     }
                 }, 500);
             };
+
+            const connectionHandler = () => {
+                chat.off('$.connected', connectionHandler);
+                chatEngine.me.notifications.enable([chatEngine.me.direct], deviceToken, registrationCompletionHandler);
+            };
             chat.on('$.connected', connectionHandler);
         });
         chatEngine.connect('pubnub', { works: true }, 'pubnub-secret');
@@ -181,8 +208,9 @@ describe('integration::ChatEngineNotifications', () => {
 
     test('should send $notifications.seen event', (done) => {
         const notification = { notification: { aps: { alert: 'PubNub is awesome!' }, cepayload: { eid: 'unique' } }, foreground: true };
+        const deviceToken = '0000000000000000000000000000000000000000000000000000000000000000';
         let messageReceived = false;
-        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true }, ignoredChats }));
+        chatEngine.proto('Me', plugin({ events: ['$.invite', 'message'], platforms: { ios: true, android: true } }));
         chatEngine.on('$.ready', () => {
             const messageHandler = (message) => {
                 messageReceived = true;
@@ -196,8 +224,14 @@ describe('integration::ChatEngineNotifications', () => {
                 jest.clearAllTimers();
                 done();
             };
-            const connectionHandler = () => {
-                chatEngine.me.direct.off('$.connected', connectionHandler);
+
+            const registrationCompletionHandler = (error) => {
+                if (error) {
+                    jest.clearAllTimers();
+                    done();
+                    return;
+                }
+
                 chatEngine.me.direct.on('$notifications.seen', messageHandler);
                 chatEngine.me.notifications.markNotificationAsSeen(notification);
                 let retryInterval = setInterval(() => {
@@ -207,6 +241,11 @@ describe('integration::ChatEngineNotifications', () => {
                         clearInterval(retryInterval);
                     }
                 }, 500);
+            };
+
+            const connectionHandler = () => {
+                chatEngine.me.direct.off('$.connected', connectionHandler);
+                chatEngine.me.notifications.enable([chatEngine.me.direct], deviceToken, registrationCompletionHandler);
             };
             if (!chatEngine.me.direct.connected) {
                 chatEngine.me.direct.on('$.connected', connectionHandler);

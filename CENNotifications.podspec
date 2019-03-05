@@ -19,7 +19,7 @@ Pod::Spec.new do |spec|
     :tag => "v#{spec.version}"
   }
 
-  spec.ios.deployment_target = '8.0'
+  spec.ios.deployment_target = '9.0'
   spec.requires_arc = true
 
   spec.preserve_paths = "package.json", "LICENSE"

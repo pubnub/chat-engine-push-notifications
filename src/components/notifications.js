@@ -8,12 +8,14 @@ import { EventEmitter2 } from 'eventemitter2';
 import CENotificationCategory from '../models/notification-category';
 import { TypeValidator, throwError } from '../helpers/utils';
 
-const { CENNotifications } = NativeModules;
+let { CENNotifications } = NativeModules;
 
 /**
  * Notifications handler for {@link ChatEngine}.
- * Module utilize React Native features to make it possible to communicate from JS to native counterpart. This allow to register for notifications
- * (specify notification handling categories for iOS) and be notified when registration completes or when notification has been received.
+ * Module utilize React Native features to make it possible to communicate from JS to native
+ * counterpart. This allow to register for notifications
+ * (specify notification handling categories for iOS) and be notified when registration completes or
+ * when notification has been received.
  */
 export default class CENotifications extends EventEmitter2 {
     /**
@@ -39,10 +41,16 @@ export default class CENotifications extends EventEmitter2 {
 
         this.subscribeOnNativeModuleEvents();
 
+        if (CENNotifications === undefined || CENNotifications === null) {
+            console.log(`Looks like native ${Platform.OS} module not registered properly.`);
+            throw new Error(`Looks like native ${Platform.OS} module not registered properly.`);
+        }
+
         /**
          * Inform native module, what React Native part is ready and would like to receive any missed events.
+         * We give some delay, so user will have time to subscribe on emitted events.
          */
-        CENNotifications.receiveMissedEvents();
+        setTimeout(() => CENNotifications.receiveMissedEvents(), 1000);
     }
 
     /**
@@ -59,20 +67,20 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Retrieve number which is currently shown on application's icon badge.
      *
-     * @param {CENApplicationBadgeNumberCallback} callback - Reference on callback function which will be called when native module will be ready to
-     *     return value.
+     * @param {CENApplicationBadgeNumberCallback} callback - Reference on callback function which
+     *     will be called when native module will be ready to return value.
      *
      * @example <caption>Get current application icon badge number</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
      * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
+     *
      *     ChatEngine.me.notifications.applicationIconBadgeNumber(number =>
      *         console.log('Current icon badge number is:', number));
      * });
@@ -92,19 +100,20 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Update number which is shown on application's icon badge.
      *
-     * @param {Number} number - Reference on value which should be set as application icon badge number.
+     * @param {Number} number - Reference on value which should be set as application icon badge
+     *     number.
      *
      * @example <caption>Set current application icon badge number</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
      * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
+     *
      *     ChatEngine.me.notifications.setApplicationIconBadgeNumber(2);
      * });
      *
@@ -121,40 +130,48 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Ask native module to request feature access permission with specified categories.
      *
-     * @param {CEPermissions} [permissions] - List of features to which push notification would like to have access (**iOS only**).
-     * @param {CENotificationCategory[]} [categories] - List of push notifications handling categories (**iOS only**).
+     * @param {CEPermissions} [permissions] - List of features to which push notification would like
+     *     to have access (**iOS only**).
+     * @param {CENotificationCategory[]} [categories] - List of push notifications handling
+     *     categories (**iOS only**).
      * @throws {Object} Error in case if user refused to grant requested permissions.
-     * @return {Promise} Reference on {@link Promise} object which allow to handle request process completion with success or failure.
+     * @return {Promise} Reference on {@link Promise} object which allow to handle request process
+     *     completion with success or failure.
      *
      * @example <caption>Permissions request</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
      * ChatEngine.on('$.ready', () => {
-     *     // Passed permissions for multi-platform (iOS/Android) will be ignored when Android will be requested for permissions.
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
+     *
+     *     // Passed permissions for multi-platform (iOS/Android) will be ignored when Android will
+     *     // be requested for permissions.
      *     // For Android only application there is no need to pass permissions.
      *     ChatEngine.me.notifications.requestPermissions({alert: true, badge: false, sound: true})
      *         .then(permissions => console.log('Granted with permissions:', JSON.stringify(permissions)))
      *         .catch(error => console.log('Permissions request did fail:', error));
      * });
      *
-     * @throws {TypeError} in case if passed `permissions` is not type of _object_ or has unknown keys with non-boolean values.
-     * @throws {TypeError} in case if passed `categories` is not type of _array_ of {@link CENotificationCategory} instances.
+     * @throws {TypeError} in case if passed `permissions` is not type of _object_ or has unknown
+     *     keys with non-boolean values.
+     * @throws {TypeError} in case if passed `categories` is not type of _array_ of
+     *     {@link CENotificationCategory} instances.
      */
     async requestPermissions(permissions, categories) {
         if (Platform.OS === 'ios') {
             if (!TypeValidator.sequence(permissions, ['notEmpty', ['hasKnownKeys', ['alert', 'sound', 'badge']], ['hasValuesOf', Boolean]])) {
-                return Promise.reject(TypeError('Unexpected permissions: empty or has unexpected data type (object expected) with unknown keys and ' +
-                    'value types (boolean expected).'));
-            } else if (TypeValidator.notEmpty(categories) && !TypeValidator.isArrayOf(categories, CENotificationCategory)) {
-                return Promise.reject(TypeError('Unexpected categories: unexpected categories entry data type (CENotificationCategory instance ' +
-                    'expected).'));
+                return Promise.reject(TypeError('Unexpected permissions: empty or has unexpected data type (object expected) with unknown keys and '
+                  + 'value types (boolean expected).'));
+            }
+
+            if (TypeValidator.notEmpty(categories) && !TypeValidator.isArrayOf(categories, CENotificationCategory)) {
+                return Promise.reject(TypeError('Unexpected categories: unexpected categories entry data type (CENotificationCategory instance '
+                  + 'expected).'));
             }
 
             try {
@@ -171,31 +188,33 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Ask native module to register notification channels on Android.
      *
-     * @param {NotificationChannelConfiguration[]} channels - List of notification channel configuration objects.
+     * @param {NotificationChannelConfiguration[]} channels - List of notification channel
+     *     configuration objects.
      *
      * @example <caption>Permissions request</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
+     * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
      *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
-     * ChatEngine.on('$.ready', () =>
      *     ChatEngine.me.notifications.registerNotificationChannels([
      *         { id: 'unique-id , name: 'defaultChannel', lights: false }
      *     ])
-     * );
+     * });
      *
-     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has unexpected data type.
+     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has
+     *     unexpected data type.
      */
     registerNotificationChannels(channels) {
         if (Platform.OS === 'android') {
             if (!TypeValidator.isArrayOf(channels, Object)) {
-                throwError(new TypeError('Unexpected channels: has unexpected data type (array expected) with unknown value types (object ' +
-                    'expected).'));
+                throwError(new TypeError('Unexpected channels: has unexpected data type (array expected) with unknown value types (object '
+                  + 'expected).'));
                 return;
             }
             CENNotifications.registerNotificationChannels(channels);
@@ -205,7 +224,8 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Ask native module to register for notification actions on Android.
      *
-     * @param {Object} actions - Object which contain name of actions and target activity name as values. Name should conform to following template
+     * @param {Object} actions - Object which contain name of actions and target activity name as
+     *     values. Name should conform to following template
      *     `<package-name>.<path-to-class>.<activity-class-name>`. (**Android only**).
      *     Pass `default` as value to show launcher activity.
      *     Pass `none` as value to keep application closed.
@@ -213,22 +233,25 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Permissions request</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
+     * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
      *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
-     * ChatEngine.on('$.ready', () => ChatEngine.me.notifications.registerNotificationActions({ Accept: 'JoinScreen', Reject: 'none' }));
+     *     ChatEngine.me.notifications.registerNotificationActions({ Accept: 'JoinScreen', Reject: 'none' })
+     * });
      *
-     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has unexpected data type.
+     * @throws {TypeError} in case if passed `actions` is not type of _Array_ or values has
+     *     unexpected data type.
      */
     registerNotificationActions(actions) {
         if (Platform.OS === 'android') {
             if (!TypeValidator.sequence(actions, [['isTypeOf', Object], ['hasValuesOf', String]])) {
-                throwError(new TypeError('Unexpected actions: empty or has unexpected data type (array expected) with unknown value types (string ' +
-                    'expected).'));
+                throwError(new TypeError('Unexpected actions: empty or has unexpected data type (array expected) with unknown value types (string '
+                  + 'expected).'));
                 return;
             }
             CENNotifications.registerNotificationActions(actions);
@@ -237,19 +260,20 @@ export default class CENotifications extends EventEmitter2 {
 
     /**
      * Try to retrieve push notification payload which has been used to launch application.
-     * If any remote notification has been used to open application it will be sent along with `$notifications.received` event.
+     * If any remote notification has been used to open application it will be sent along with
+     * `$notifications.received` event.
      *
      * @example <caption>Request for initial notification</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     *  }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
      * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *      }));
+     *
      *     ChatEngine.me.notifications.on('$notifications.received', notification => {
      *          // Initial messages delivered with 'foreground' set to 'false'.
      *         if (!notification.foreground) {
@@ -272,14 +296,14 @@ export default class CENotifications extends EventEmitter2 {
      * @example <caption>Request for all delivered notifications</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
-     *     events: ['$.invite', 'message'],
-     *     platforms: { ios: true, android: true }
-     * }));
-     *
-     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As soon as Chat Engine connect user, it will issue
-     * // '$.ready' event.
+     * // Since plugin extend Me, it first should be initialized with Chat Engine connection. As
+     * // soon as Chat Engine connect user, it will issue '$.ready' event.
      * ChatEngine.on('$.ready', () => {
+     *     ChatEngine.me.plugin(plugin({
+     *         events: ['$.invite', 'message'],
+     *         platforms: { ios: true, android: true }
+     *     }));
+     *
      *     ChatEngine.me.notifications.deliveredNotifications(notifications => {
      *         notifications.forEach(notification =>
      *             console.log(`Notification received at ${notification.date}: ${JSON.stringify(notification.notification)}`));
@@ -299,9 +323,10 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Try format message using formatter function from native module (if specified).
      *
-     * @param {CENRNNotificationPayload} payload - Reference on object which contain all information which can be useful for notification formatting.
-     * @param {CENNotificationsFormatterCallback} callback - Reference on function which will be called by native module formatter method at the end
-     *     of data processing.
+     * @param {CENRNNotificationPayload} payload - Reference on object which contain all information
+     *     which can be useful for notification formatting.
+     * @param {CENNotificationsFormatterCallback} callback - Reference on function which will be
+     *     called by native module formatter method at the end of data processing.
      *
      * @throws {TypeError} in case if passed `payload` is not type of _object_ or empty.
      * @throws {TypeError} in case if passed `callback` is not type of _function_.
@@ -311,7 +336,9 @@ export default class CENotifications extends EventEmitter2 {
         if (!TypeValidator.sequence(payload, ['notEmpty', ['isTypeOf', Object]])) {
             throwError(new TypeError('Unexpected payload: empty or has unexpected data type (object expected).'));
             return;
-        } else if (!TypeValidator.isTypeOf(callback, 'function')) {
+        }
+
+        if (!TypeValidator.isTypeOf(callback, 'function')) {
             throwError(new TypeError('Unexpected callback: undefined or has unexpected data type (function expected).'));
             return;
         }
@@ -320,8 +347,8 @@ export default class CENotifications extends EventEmitter2 {
 
     /**
      * Subscribe on events which is triggered by native part of Rect Native.
-     * All {@link CENotifications} prefixed with 'CEN' to make it easier to track them. {@link DeviceEventEmitter} class emit many events and not only
-     * from {@link CENotifications}.
+     * All {@link CENotifications} prefixed with 'CEN' to make it easier to track them.
+     * {@link DeviceEventEmitter} class emit many events and not only from {@link CENotifications}.
      * @private
      */
     subscribeOnNativeModuleEvents() {
@@ -334,9 +361,11 @@ export default class CENotifications extends EventEmitter2 {
      * Handle successful registration on notifications handling.
      *
      * @param {Object} token - Received device push token information object.
-     * @param {String} token.deviceToken - Reference on actual device push token which should be used with chat channels registration API.
+     * @param {String} token.deviceToken - Reference on actual device push token which should be
+     *     used with chat channels registration API.
      *
-     * @emits {$notifications.registered} emit event when native module reported back what device did receive notification token.
+     * @emits {$notifications.registered} emit event when native module reported back what device
+     *     did receive notification token.
      * @private
      */
     onRegister(token) {
@@ -348,7 +377,8 @@ export default class CENotifications extends EventEmitter2 {
      *
      * @param {Object} error - Received registration error explanation.
      *
-     * @emits {$notifications.registration.fail} emit event when native module reported back what device registration did fail.
+     * @emits {$notifications.registration.fail} emit event when native module reported back what
+     *     device registration did fail.
      * @private
      */
     onRegistrationFail(error) {
@@ -358,8 +388,10 @@ export default class CENotifications extends EventEmitter2 {
     /**
      * Handle incoming push notification.
      *
-     * @param {CENNotificationPayload} payload - Reference on object which contain information about pushed data and completion callback (if passed).
-     * @emits {$notifications.received} emit when device receive new remote notification sent by **PubNub** service on request of remote user.
+     * @param {CENNotificationPayload} payload - Reference on object which contain information about
+     *     pushed data and completion callback (if passed).
+     * @emits {$notifications.received} emit when device receive new remote notification sent by
+     *     **PubNub** service on request of remote user.
      *
      * @throws {TypeError} in case if passed `notification` is not type of _object_ or empty.
      * @private

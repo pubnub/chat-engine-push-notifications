@@ -1,5 +1,6 @@
 /**
  * @file File contain only @typedefs for native {@link ChatEngine} notifications module, so there is no need to import it.
+ *
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
 
@@ -48,7 +49,7 @@
  * Function which allow to request required set of permissions for notifications.
  *
  * @typedef {function} CENRequestPermissionsFunction
- * @param {CEPermissions} permissions - Reference on object which contain set of required persmissions.
+ * @param {CEPermissions} permissions - Reference on object which contain set of required permissions.
  */
 
 /**

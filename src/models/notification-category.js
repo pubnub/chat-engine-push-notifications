@@ -85,13 +85,19 @@ export default class CENotificationCategory {
         if (!TypeValidator.sequence(options.identifier, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected identifier: empty or has unexpected data type (string expected).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.bodyPlaceholder, [['isTypeOf', String], 'notEmpty'])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.bodyPlaceholder, [['isTypeOf', String], 'notEmpty'])) {
             throwError(new TypeError('Unexpected placeholder: empty or has unexpected data type (string expected).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.context, [['isTypeOf', String], ['isOneOf', ['default', 'minimal']]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.context, [['isTypeOf', String], ['isOneOf', ['default', 'minimal']]])) {
             throwError(new TypeError('Unexpected context: empty or has unknown value (known: default and minimal).'));
             return false;
-        } else if (!TypeValidator.sequenceIfDefined(options.actions, ['notEmpty', ['isArrayOf', CENotificationAction]])) {
+        }
+
+        if (!TypeValidator.sequenceIfDefined(options.actions, ['notEmpty', ['isArrayOf', CENotificationAction]])) {
             throwError(new TypeError('Unexpected actions: empty or has unexpected data type (CENotificationAction expected).'));
             return false;
         }

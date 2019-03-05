@@ -8,24 +8,18 @@ import CENotifications from './notifications';
 import { TypeValidator, throwError } from '../helpers/utils';
 
 /**
- * Stores reference on instances for which `destruct` function has been used. This function should be used when current used is leaving (switching
- * user).
+ * Stores reference on instances for which `destruct` function has been used. This function should
+ * be used when current used is leaving (switching user).
  * @type {CENotificationsExtension[]}
  * @private
  */
 const destructingInstances = [];
 
 /**
- * How many times notification state change attempts should be done in case if previous failed because of PAM error.
+ * Maximum length of string with channel names which can be sent with PubNub API at once.
  * @type {number}
  */
-const pamRetryCount = 5;
-
-/**
- * Delay which should be used by timer to retry failed operations submission.
- * @type {number}
- */
-const retryDelay = 1000;
+const pushNotificationMaximumChannelsLength = 20000;
 
 /**
  * Basic interface for {@link Chat} class extensions.
@@ -42,31 +36,26 @@ export class ChatEnginePlugin {
 
 
 /**
- * Plugin utilize React Native features to make it possible to communicate from JS to native counterpart. This allow to register for notifications
- * (specify notification handling categories for iOS) and be notified when registration completes or when notification has been received.
+ * Plugin utilize React Native features to make it possible to communicate from JS to native
+ * counterpart. This allow to register for notifications (specify notification handling categories
+ * for iOS) and be notified when registration completes or when notification has been received.
  */
 export class CENotificationsExtension extends ChatEnginePlugin {
     /**
      * Create and configure {@link ChatEngine} plugin to work with push notifications.
      *
      * @param {!CEConfiguration} configuration - Push notification registration/handling options.
-     * @listens {$notifications.registered} listen event to start push notification management for chat which requested it.
-     * @listens {$notifications.received} listen event to mark received notification as `seen` (if `configuration.markAsSeen` is set to `true`).
-     * @listens {$.created.chat} listen event to enable push notifications on just created chat if it explicitly not ignored
-     *     (`configuration.ignoredChats`).
-     * @listens {$.connected} listen event to enable push notifications on chat if it explicitly not ignored
-     *     (`configuration.ignoredChats`).
      * @example <caption>Simple setup</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
+     * ChatEngine.me.plugin(plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true }
      * }));
      * @example <caption>Setup with notification formatter</caption>
      * import { plugin } from 'chat-engine-notifications';
      *
-     * ChatEngine.proto('Me', plugin({
+     * ChatEngine.me.plugin(plugin({
      *     events: ['$.invite', 'message'],
      *     platforms: { ios: true, android: true },
      *     formatter: (payload) => {
@@ -79,7 +68,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      *                     sentToChat: payload.chat.channel,
      *                     sentData: payload.data
      *                 }
-      *            };
+     *            };
      *         } else if (payload.event === '$.invite') {
      *             // Use one of default formatter (there is for '$.invite' and 'message' events).
      *             return nil;
@@ -94,6 +83,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
             super(configuration);
             return;
         }
+
         CENotificationsExtension.applyDefaultConfigurationValues(configuration);
         super(configuration);
         /**
@@ -103,20 +93,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         this.configuration = configuration;
 
         /**
-         * Reference on token which has been received by device during registration for remote notifications.
-         * @type {?String}
-         * @private
-         */
-        this.notificationToken = null;
-
-        /**
-         * Reference on object which store information about current state of things with notifications for {@link Me}'s chats.
-         * @type {Object<String, ObservedChatData>}
-         * @private
-         */
-        this.chatsState = {};
-
-        /**
          * Stores whether instance is de-initializing.
          * @type {boolean}
          * @private
@@ -124,18 +100,17 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         this.destructing = false;
 
         /**
-         * Stores reference on timer which is used to retry push notifications state change for previously failed {@link Chat}s.
-         * @type {Number}
-         * @private
-         */
-        this.retryInterval = null;
-
-        /**
          * Stores reference on notification handler for plugin.
          * @type {CENotifications}
          * @private
          */
         this.notifications = new CENotifications();
+        /** @public */
+        this.notifications.enable = this.enable.bind(this);
+        /** @public */
+        this.notifications.disable = this.disable.bind(this);
+        /** @public */
+        this.notifications.disableAll = this.disableAll.bind(this);
         /** @public */
         this.notifications.markNotificationAsSeen = this.markNotificationAsSeen.bind(this);
         /** @public */
@@ -145,16 +120,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
             this.notifications._destruct();
             this.destruct();
         };
-
-        // Register for important notifications.
-        /** @type {function(notificationToken: String)} */
-        this._onDeviceRegister = token => this.onDeviceRegister(token);
-        /** @type {function(notificationToken: CENNotificationPayload)} */
-        this._onNotification = payload => this.onNotification(payload);
-        /** @type {function(data: Object, chat: Chat)} */
-        this._onChatCreate = (data, chat) => this.onChatCreate(data, chat);
-        /** @type {function(data: Object, chat: Chat)} */
-        this._onChatConnect = (data, chat) => this.onChatConnect(data, chat);
     }
 
     /**
@@ -164,13 +129,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     construct() {
         /** @type CENotifications */
         this.parent.notifications = this.notifications;
-        this.parent.notifications.on('$notifications.registered', this._onDeviceRegister);
-        if (this.configuration.markAsSeen) {
-            this.parent.notifications.on('$notifications.received', this._onNotification);
-        }
-        this.ChatEngine.on('$.created.chat', this._onChatCreate);
-        this.ChatEngine.on('$.connected', this._onChatConnect);
-        Object.keys(this.ChatEngine.chats).forEach(chatChannel => this.onChatCreate({}, this.ChatEngine.chats[chatChannel]));
     }
 
     /**
@@ -181,27 +139,6 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         this.destructing = true;
         destructingInstances.push(this);
 
-        // Stop listening events from other modules.
-        this.parent.notifications.off('$notifications.registered', this._onDeviceRegister);
-        if (this.configuration.markAsSeen) {
-            this.parent.notifications.off('$notifications.received', this._onNotification);
-        }
-        this.ChatEngine.off('$.created.chat', this._onChatCreate);
-        this.ChatEngine.off('$.connected', this._onChatConnect);
-
-        // Disable push notifications for all previously enabled chats.
-        Object.keys(this.chatsState).forEach((channel) => {
-            if (!TypeValidator.isDefined(this.chatsState[channel].states) || this.chatsState[channel].states.includes('ignored')) {
-                delete this.chatsState[channel];
-            } else {
-                const chat = this.ChatEngine.chats[channel];
-                if (chat !== null && chat !== undefined) {
-                    this.setPushNotificationState(chat, 'disable');
-                } else {
-                    delete this.chatsState[channel];
-                }
-            }
-        });
         // Try to clean up in case if there is no more observed chats is left.
         this.cleanUp();
     }
@@ -211,18 +148,176 @@ export class CENotificationsExtension extends ChatEnginePlugin {
      * @private
      */
     cleanUp() {
-        if (!Object.keys(this.chatsState).length) {
-            let instanceIdx = destructingInstances.indexOf(this);
-            destructingInstances.splice(instanceIdx, 1);
-            this.parent.notifications = null;
-        }
+        let instanceIdx = destructingInstances.indexOf(this);
+        destructingInstances.splice(instanceIdx, 1);
+        this.parent.notifications = null;
     }
 
     /**
-     * Mark passed `notification` as seen on all devices which is registered for push notification for current user.
+     * Enable push notifications on specified list of {@link Chat}s.
+     * Device push token can be obtained by subscribing on '$notifications.registered' event as
+     * shown in example below.
      *
-     * @param {CENNotificationPayload} notification - Reference on notification which should be marked by native module as 'seen'.
+     * @example <caption>Obtain device push token</caption>
+     * ChatEngine.me.notifications.on('$notifications.registered', (devicePushToken) => {
+     *     this.devicePushToken = devicePushToken;
+     * });
+     *
+     * @example <caption>Usage example</caption>
+     * ChatEngine.me.notifications.enable(ChatEngine.global, this.devicePushToken, (errorStatuses) => {
+     *     if (errorStatuses) {
+     *         // Handle push notification state change error statues.
+     *     } else {
+     *         // Push notification for global has been enabled.
+     *     }
+     * });
+     *
+     * @param {Array<Chat>} chats List of {@link Chat}s for which remote notification should be
+     *     triggered.
+     * @param {String} token Device token which has been provided by OS through ReactNative.
+     * @param {?function(errorStatuses: Object)} [completion] - Function which will be called at
+     *     the end of registration process and pass error (if any).
+     */
+    enable(chats, token, completion) {
+        if (!TypeValidator.isTypeOf(token, String) || !token.length || !chats.length) {
+            return;
+        }
+
+        this.addChannels(true, chats, token, completion);
+    }
+
+    /**
+     * Disable push notifications on specified list of {@link Chat}s.
+     * Device push token can be obtained by subscribing on '$notifications.registered' event as
+     * shown in example below.
+     *
+     * @example <caption>Obtain device push token</caption>
+     * ChatEngine.me.notifications.on('$notifications.registered', (devicePushToken) => {
+     *     this.devicePushToken = devicePushToken;
+     * });
+     *
+     * @example <caption>Usage example</caption>
+     * ChatEngine.me.notifications.disable(ChatEngine.global, this.devicePushToken, (errorStatuses) => {
+     *     if (errorStatuses) {
+     *         // Handle push notification state change error statues.
+     *     } else {
+     *         // Push notification for global has been disabled.
+     *     }
+     * });
+     *
+     * @param {Array<Chat>} chats List of {@link Chat}s for which remote notification should be
+     *     removed.
+     * @param {String} token Device token which has been provided by OS through ReactNative.
+     * @param {?function(errorStatuses: Object)} [completion] - Function which will be called at
+     *     the end of unregister process and pass error (if any).
+     */
+    disable(chats, token, completion) {
+        if (!TypeValidator.isTypeOf(token, String) || !token.length || !chats.length) {
+            return;
+        }
+
+        this.addChannels(false, chats, token, completion);
+    }
+
+    /**
+     * Disable all push notifications for device.
+     * Device push token can be obtained by subscribing on '$notifications.registered' event as
+     * shown in example below.
+     *
+     * @example <caption>Obtain device push token</caption>
+     * ChatEngine.me.notifications.on('$notifications.registered', (devicePushToken) => {
+     *     this.devicePushToken = devicePushToken;
+     * });
+     *
+     * @example <caption>Usage example</caption>
+     * ChatEngine.me.notifications.disableAll(this.devicePushToken, (errorStatuses) => {
+     *     if (errorStatuses) {
+     *         // Handle push notification unregister error statuses.
+     *     } else {
+     *         // Device has been unregistered from push notification.
+     *     }
+     * });
+     *
+     * @param {String} token Device token which has been provided by OS through ReactNative.
+     * @param {?function(errorStatuses: Object)} [completion] - Function which will be called at
+     *     the end of unregister process and pass error (if any).
+     */
+    disableAll(token, completion) {
+        if (!TypeValidator.isTypeOf(token, String) || !token.length) {
+            return;
+        }
+
+        this.addChannels(false, null, token, completion);
+    }
+
+    /**
+     * Change notifications state for specified chats on device.
      * @private
+     *
+     * @param {Boolean} shouldAddChannels Whether chats has been added to device push notifications
+     *     or not.
+     * @param {Array<Chat>} chats List of chats for which push notification state has been changed
+     *     on device.
+     * @param {String} device Device token which has been provided by OS through ReactNative.
+     * @param {?function(error: Error)} [completion] - Function which will be called at
+     *     the end of modification process and pass error (if any).
+     */
+    addChannels(shouldAddChannels, chats, device, completion) {
+        /** @tuype {Array<Array<String>>} */
+        const channelSeries = chats !== null ? CENotificationsExtension.channelSeriesFromChats(chats) : [];
+        /** @type {String} */
+        const pushGateway = Platform.OS === 'ios' ? 'apns' : 'gcm';
+        /** @type {PubNub} */
+        const pubNub = this.ChatEngine.pubnub;
+        let endpoint = pubNub.push[shouldAddChannels ? 'addChannels' : 'removeChannels'];
+        let seriesProcessed = 0;
+        /** @type {Array} */
+        let errors = [];
+
+        const statusHandler = (status) => {
+            seriesProcessed += 1;
+
+            if (status.error) {
+                /** @type {Error} */
+                let error = status.errorData || null;
+
+                if (error && error.response && error.response.text) {
+                    const response = JSON.parse(status.errorData.response.text);
+
+                    if (response && response.payload && response.payload.channels) {
+                        const channelNames = response.payload.channels;
+                        error.chats = CENotificationsExtension.chatListFromChannelNames(channelNames, this.ChatEngine.me);
+                    }
+                }
+
+                if (error) {
+                    errors.push(error);
+                }
+            }
+
+            if (seriesProcessed === channelSeries.length || chats === null) {
+                if (this.destructing) {
+                    return;
+                }
+
+                this.onChatsNotificationStateChange(shouldAddChannels, chats, errors, completion);
+            }
+        };
+
+        if (chats === null) {
+            pubNub.push.deleteDevice({ device, pushGateway }, statusHandler);
+            return;
+        }
+
+        channelSeries.forEach(channels => endpoint({ channels, device, pushGateway }, statusHandler));
+    }
+
+    /**
+     * Mark passed `notification` as seen on all devices which is registered for push notification
+     * for current user.
+     *
+     * @param {CENNotificationPayload} notification - Reference on notification which should be
+     *     marked by native module as 'seen'.
      */
     markNotificationAsSeen(notification) {
         if (!TypeValidator.sequence(notification, [['isTypeOf', Object], 'notEmpty',
@@ -245,8 +340,8 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     }
 
     /**
-     * Mark all notifications as seen on all devices which is registered for push notifications for current user.
-     * @private
+     * Mark all notifications as seen on all devices which is registered for push notifications for
+     * current user.
      */
     markAllNotificationAsSeen() {
         this.parent.notifications.emit('$notifications.seen');
@@ -254,97 +349,35 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     }
 
     /**
-     * Change push notification state for passed {@link Chat}.
-     *
-     * @param {Chat} chat - Reference on chat instance from which push notification state should be changed.
-     * @param {String} state - Reference on one of: enable or disable.
-     * @param {Boolean} [chained=false] - Whether state change has been called for channel which has few states (additional state change has been
-     *     issued while previous request wasn't completed).
-     * @private
-     */
-    setPushNotificationState(chat, state, chained = false) {
-        if (state === 'erredEnable' || state === 'erredDisable') {
-            state = state === 'erredEnable' ? 'enable' : 'disable';
-        }
-        // Intermediate and unknown states should be ignored.
-        if (state !== 'enable' && state !== 'disable') {
-            return;
-        }
-        const enable = state === 'enable';
-        let { channel } = chat;
-
-        // Check whether state change for chat is still processing. While there is active requests, new state change should be recorded to be
-        // performed after completion.
-        const currentState = this.chatsState[channel].states[0];
-        if ((currentState === 'enabling' && !enable) || (currentState === 'disabling' && enable)) {
-            this.chatsState[channel].states.push(state);
-            return;
-        }
-
-        // Check whether previous change request not even started and new one switch to opposite state. In this case previous state should be replaced
-        // with new one.
-        if ((currentState === 'enable' && !enable) || (currentState === 'disable' && enable)) {
-            this.chatsState[channel].states = [state];
-            chained = true;
-        }
-
-        const tokenAvailable = this.notificationToken !== null && this.notificationToken !== undefined;
-        if (tokenAvailable && (CENotificationsExtension.canChangeState(this.chatsState[channel].states, state) || chained)) {
-            const pushGateway = Platform.OS === 'ios' ? 'apns' : 'gcm';
-            const endpoint = this.ChatEngine.pubnub.push[enable ? 'addChannels' : 'removeChannels'];
-            this.chatsState[channel].states[0] = enable ? 'enabling' : 'disabling';
-            endpoint({ channels: [channel], device: this.notificationToken, pushGateway }, status =>
-                this.onPushNotificationStateChangeCompletion(chat, enable, status));
-        } else if (!tokenAvailable && this.chatsState[channel].states.length && this.chatsState[channel].states[0] === 'created') {
-            this.onPushNotificationStateChangeCompletion(chat, enable, { error: {} });
-        }
-    }
-
-    /**
-     * Retry change of push notification state for previously not completed/failed operations.
-     * @private
-     */
-    startDelayedNotificationStateChange() {
-        if (this.retryInterval !== null) {
-            clearInterval(this.retryInterval);
-        }
-
-        this.retryInterval = setInterval(() => {
-            clearInterval(this.retryInterval);
-            this.retryInterval = null;
-            Object.keys(this.chatsState).forEach((channel) => {
-                const states = this.chatsState[channel].states || [];
-                const chat = this.ChatEngine.chats[channel];
-                if (states.length && chat !== null && chat !== undefined) {
-                    this.setPushNotificationState(chat, states[0]);
-                }
-            });
-        }, retryDelay);
-    }
-
-    /**
      * Construct `emit` middleware for {@link Chat}.
-     *
-     * @return {{namespace: String, middleware: { emit: Object }}} Reference on middleware configuration which will allow to handle specified (by
-     *     configuration) set of events and modify events payload.
      * @private
+     *
+     * @return {{namespace: String, middleware: { emit: Object }}} Reference on middleware
+     *     configuration which will allow to handle specified (by configuration) set of events and
+     *     modify events payload.
      */
     chatMiddlewareExtension() {
         let emit = {};
-        this.configuration.events.forEach((event) => { emit[event] = (payload, next) => this.notificationFormatter(event, payload, next); });
+
+        this.configuration.events.forEach((event) => {
+            emit[event] = (payload, next) => this.notificationFormatter(event, payload, next);
+        });
+
         return { namespace: 'chatEngineNotifications.chat', middleware: { emit } };
     }
 
     /**
      * Event payload formatter.
-     * User function will be used to format notification layout (if provided in React environment or through native module) or builtin formatter will
-     * be used if there is no other options.
-     *
-     * @param {String} event - Reference on event for which `payload` should be formatted for notification.
-     * @param {ChatEngineEventPayload} payload - Reference on object which contain information sent along with `event`.
-     * @param {function(error: Object, payload: Object)} next - Reference on function which should be used to notify about formatting process
-     *     completion.
+     * User function will be used to format notification layout (if provided in React environment or
+     * through native module) or builtin formatter will be used if there is no other options.
      * @private
+     *
+     * @param {String} event - Reference on event for which `payload` should be formatted for
+     *     notification.
+     * @param {ChatEngineEventPayload} payload - Reference on object which contain information sent
+     *     along with `event`.
+     * @param {function(error: Object, payload: Object)} next - Reference on function which should
+     *     be used to notify about formatting process completion.
      */
     notificationFormatter(event, payload, next) {
         const formatterProvided = (this.configuration.formatter !== null && this.configuration.formatter !== undefined);
@@ -390,129 +423,65 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     }
 
     /**
-     * Handle device registration for remote notification completion.
-     *
-     * @param {String} notificationToken - Reference on token which should be used by backend to identify target device to which notification for
-     *     {@link Chat} should be delivered.
+     * Push notification state change request results handler.
      * @private
+     *
+     * @param {Boolean} addingChannels Whether chats has been added to device push notifications or
+     *     not.
+     * @param {Array<Chat>} chats List of chats for which push notification state has been changed
+     *     on device.
+     * @param {?Array<Error>} errors List of error statuses which has been generated during state change.
+     * @param {?function(error: Error)} [completion] - Function which will be called at
+     *     the end of modification process and pass error (if any).
      */
-    onDeviceRegister(notificationToken) {
-        // Re-enable notifications in case if they has been enabled earlier during application operation time.
-        if (TypeValidator.isDefined(this.notificationToken) && this.notificationToken !== notificationToken) {
-            Object.keys(this.chatsState).forEach((channel) => {
-                if (this.chatsState[channel].states.includes('enabled') || this.chatsState[channel].states.includes('enabling')) {
-                    this.chatsState[channel].states = ['enable'];
+    onChatsNotificationStateChange(addingChannels, chats, errors, completion) {
+        chats = chats !== null && chats.length ? chats : Object.values(this.ChatEngine.chats);
+        let error = errors.length >= 1 ? errors[0] : null;
+
+        if (errors.length > 1) {
+            let failedChats = [];
+
+            errors.forEach((storedError) => {
+                if (storedError.chats) {
+                    failedChats = failedChats.concat(storedError.chats);
                 }
             });
+
+            error.chats = failedChats;
         }
-        this.notificationToken = notificationToken;
-        this.startDelayedNotificationStateChange();
-    }
 
-    /**
-     * Handle push notification state change REST request completion.
-     *
-     * @param {Chat} chat - Reference on {@link Chat} instance for which request has been performed.
-     * @param {Boolean} enabling - Whether tried to enable or disable push notifications.
-     * @param {Object} status - **PubNub** service API call status object.
-     * @private
-     */
-    onPushNotificationStateChangeCompletion(chat, enabling, status) {
-        let { channel } = chat;
-        const channelState = this.chatsState[channel];
+        chats.forEach((chat) => {
+            const chatPlugins = chat.plugins;
+            const registeredPlugin = chatPlugins.filter(plugin => plugin.namespace === 'chatEngineNotifications.chat');
 
-        if (status.error) {
-            if (status.error.category === 'PNAccessDeniedCategory') {
-                channelState.errorCount += 1;
-                if (channelState.errorCount >= pamRetryCount) {
-                    channelState.states = ['ignored'];
+            if (!registeredPlugin.length) {
+                if (addingChannels && !errors.length) {
+                    chat.plugin(this.chatMiddlewareExtension());
                 }
-            } else {
-                channelState.states[0] = enabling ? 'erredEnable' : 'erredDisable';
-                channelState.errorCount = 0;
+            } else if (!addingChannels) {
+                chatPlugins.splice(chatPlugins.indexOf(registeredPlugin[0]), 1);
             }
-            this.startDelayedNotificationStateChange();
-        } else {
-            channelState.errorCount = 0;
-            channelState.states[0] = enabling ? 'enabled' : 'disabled';
-            if (channelState.states.length > 1) {
-                channelState.states.shift();
-                this.setPushNotificationState(chat, channelState.states[0], true);
-            } else if (this.destructing) {
-                delete this.chatsState[channel];
-                this.cleanUp();
-            }
-        }
-    }
+        });
 
-    /**
-     * Handle new notification received.
-     *
-     * @param {CENNotificationPayload} notification - Reference on notification which should be marked by native module as 'seen'.
-     * @private
-     */
-    onNotification(notification) {
-        this.parent.notifications.markNotificationAsSeen(notification);
-    }
-
-    /**
-     * Handle new {@link Chat} instance creation.
-     *
-     * @param {Object} data - Reference on object which is passed along with {@link Chat} creation `event`.
-     * @param {Chat} chat - Reference on object which has been created.
-     * @private
-     */
-    onChatCreate(data, chat) {
-        if (!this.shouldIgnoreChat(chat)) {
-            if (!TypeValidator.isDefined(this.chatsState[chat.channel])) {
-                this.chatsState[chat.channel] = { states: ['created'], errorCount: 0 };
-                if (this.canManagePushNotifications(chat)) {
-                    this.setPushNotificationState(chat, 'enable');
-                } else {
-                    this.chatsState[chat.channel].states = ['ignored'];
-                }
+        if (completion) {
+            if (error !== null && error.chats === undefined) {
+                error.chats = [];
             }
 
-            if (!chat.plugins.filter(plugin => plugin.namespace === 'chatEngineNotifications.chat').length) {
-                chat.plugin(this.chatMiddlewareExtension());
-            }
-        }
-    }
-
-    /**
-     * Handle connection to {@link Chat}.
-     *
-     * @param {Object} data - Reference on object which is passed along with {@link Chat} connection `event`.
-     * @param {Chat} chat - Reference on object to which {@link ChatEngine} connected.
-     * @private
-     */
-    onChatConnect(data, chat) {
-        if (chat.name === 'Chat' && !this.shouldIgnoreChat(chat)) {
-            if (this.canManagePushNotifications(chat)) {
-                this.setPushNotificationState(chat, 'enable');
-            }
+            completion(errors.length ? error : null);
         }
     }
 
     /**
      * Apply default values for fields which has been left empty by user.
+     * @private
      *
      * @param {CEConfiguration} configuration - reference on configuration object which should be completed with default values.
      * @private
      */
     static applyDefaultConfigurationValues(configuration) {
-        if (!TypeValidator.isDefined(configuration.markAsSeen)) {
-            configuration.markAsSeen = false;
-        }
-
         if (!TypeValidator.isDefined(configuration.messageKey)) {
             configuration.messageKey = 'message';
-        }
-
-        // Add additional channel for exclusion. There is no use for remote users to receive messages for local user activity as notifications.
-        configuration.ignoredChats = configuration.ignoredChats || [];
-        if (!configuration.ignoredChats.includes('#read.#feed')) {
-            configuration.ignoredChats.push('#read.#feed');
         }
 
         // Add additional event to list of events which should be pre-processed before sending.
@@ -523,6 +492,7 @@ export class CENotificationsExtension extends ChatEnginePlugin {
 
     /**
      * Validate notification category action options.
+     * @private
      *
      * @param {CEConfiguration} configuration - reference on configuration object which should be completed with default values.
      * @return {Boolean} `true` in case if passed object correspond to {@link CEConfiguration} object representation.
@@ -533,22 +503,22 @@ export class CENotificationsExtension extends ChatEnginePlugin {
         if (!TypeValidator.sequence(configuration, [['isTypeOf', Object], 'notEmpty'])) {
             throwError(new TypeError('Unexpected configuration: empty or has unexpected data type (object expected).'));
             return false;
-        } else if (!TypeValidator.sequence(configuration.events, [['isArrayOf', String], 'notEmpty'])) {
-            throwError(new TypeError('Unexpected events: empty or has unexpected data type (array expected) with unexpected data entry type (string ' +
-                'expected).'));
+        }
+
+        if (!TypeValidator.sequence(configuration.events, [['isArrayOf', String], 'notEmpty'])) {
+            throwError(new TypeError('Unexpected events: empty or has unexpected data type (array expected) with unexpected data entry type (string '
+              + 'expected).'));
             return false;
-        } else if (TypeValidator.isDefined(configuration.ignoredChats) && !TypeValidator.isArrayOf(configuration.ignoredChats, String)) {
-            throwError(new TypeError('Unexpected ignored chats: unexpected entries data type (string expected).'));
-            return false;
-        } else if (!TypeValidator.sequence(configuration.platforms, [['isTypeOf', Object], 'notEmpty', ['hasKnownKeys', ['ios', 'android']],
+        }
+
+        if (!TypeValidator.sequence(configuration.platforms, [['isTypeOf', Object], 'notEmpty', ['hasKnownKeys', ['ios', 'android']],
             ['hasValuesOf', Boolean]])) {
-            throwError(new TypeError('Unexpected platforms: empty or has unexpected type (string expected) with unknown keys and unexpected data entry ' +
-                'type (boolean expected).'));
+            throwError(new TypeError('Unexpected platforms: empty or has unexpected type (string expected) with unknown keys and unexpected data entry '
+              + 'type (boolean expected).'));
             return false;
-        } else if (TypeValidator.isDefined(configuration.markAsSeen) && !TypeValidator.isTypeOf(configuration.markAsSeen, Boolean)) {
-            throwError(new TypeError('Unexpected mark as seen: has unexpected data type (boolean expected).'));
-            return false;
-        } else if (TypeValidator.isDefined(configuration.formatter) && !TypeValidator.isTypeOf(configuration.formatter, 'function')) {
+        }
+
+        if (TypeValidator.isDefined(configuration.formatter) && !TypeValidator.isTypeOf(configuration.formatter, 'function')) {
             throwError(new TypeError('Unexpected formatter: has unexpected data type (function expected).'));
             return false;
         }
@@ -556,60 +526,83 @@ export class CENotificationsExtension extends ChatEnginePlugin {
     }
 
     /**
-     * Check whether passed {@link Chat} should be ignored according to passed list or not.
-     * @param {Chat} chat - Reference on chat which should be checked.
-     * @return {Boolean} `true` in case if chat name is inside of `ignoredChats` list.
+     * Get list of channel name series on which push notification state change should be done.
+     * Because there is limit on URI string length, huge list of names should be splitted into
+     * series of names.
+     * @private
+     *
+     * @param {Array<Chat>} chats List of chats for which channels should be splitted into sessions.
+     *
+     * @return {Array<Array<String>>} Series of chat channel names.
      */
-    shouldIgnoreChat(chat) {
-        if (chat.group === 'system') {
-            return !chat.channel.endsWith('#write.#direct');
+    static channelSeriesFromChats(chats) {
+        /** @type {Array<String>} */
+        const channelsList = chats.map(chat => chat.channel);
+        /** @type {String} */
+        const encodedChannelsList = encodeURIComponent(channelsList.join(','));
+        /** @type {number} */
+        let listLength = encodedChannelsList.length;
+
+        if (listLength < pushNotificationMaximumChannelsLength) {
+            return listLength === 0 ? [] : [channelsList];
         }
-        return !this.configuration.ignoredChats.every(chatChannelName => !chat.channel.endsWith(chatChannelName));
+
+        /** @type {Array<Array<String>>} */
+        let series = [];
+        /** @type {Array<String>} */
+        let currentSequence = [];
+        /** @type {String} */
+        let queryString = encodedChannelsList;
+
+        for (let channelIdx = 0; channelIdx < channelsList.length; channelIdx += 1) {
+            const channel = channelsList[channelIdx];
+            let percentEncodedChannel = encodeURIComponent(channel);
+
+            if (!queryString.length) {
+                queryString = percentEncodedChannel;
+            } else {
+                queryString = [queryString, percentEncodedChannel].join(',');
+            }
+
+            if (queryString.length < pushNotificationMaximumChannelsLength) {
+                currentSequence.push(channel);
+            } else {
+                if (currentSequence.length) {
+                    series.push(currentSequence);
+                    currentSequence = [];
+                }
+
+                queryString = '';
+                channelIdx -= 1;
+            }
+        }
+
+        if (currentSequence.length) {
+            series.push(currentSequence);
+        }
+
+        return series;
     }
 
     /**
-     * Check whether push notifications should be managed for passed {@link Chat} or not.
-     * Notifications can be managed for all non-ignored chats and excluding direct {@link Chat} for non-local user.
-     *
-     * @param {Chat} chat - Reference on {@link Chat} instance for which verification should be done.
-     * @return {Boolean} `true` in Case if notification should be enabled.
+     * Create list of {@link Chat} instances from channel names.
      * @private
-     */
-    canManagePushNotifications(chat) {
-        let shouldEnabled = true;
-        const localUserName = this.ChatEngine.me.uuid;
-
-        // If direct chat, ensure what it is for local user.
-        if (chat.channel.endsWith('#write.#direct')) {
-            shouldEnabled = chat.channel.endsWith(`${localUserName}#write.#direct`);
-        }
-
-        return shouldEnabled;
-    }
-
-    /**
-     * Check whether chat state can change to specified state or not.
      *
-     * @param {String[]} currentStates - Current observed {@link Chat} states (there can be two in case if additional change has been requested when
-     *     another request was active).
-     * @param {String} targetState - Target state for {@link Chat}.
-     * @return {boolean} Whether state transition allowed or not.
-     * @private
+     * @param {Array<String>} channels List of channel names for which corresponding {@link Chat}
+     *     instance should be returned.
+     * @param {User} user User for which push notifications managed.
      */
-    static canChangeState(currentStates, targetState) {
-        /** @type {Object<String, String[]>} */
-        const changeDirections = {
-            created: ['enable', 'disable'],
-            disable: ['disabling', 'enable'],
-            disabling: ['disabled', 'enable'],
-            erredDisable: ['disable', 'enable'],
-            disabled: ['enable'],
-            enable: ['enabling', 'disable'],
-            enabling: ['enabled', 'disable'],
-            erredEnable: ['enable', 'disable'],
-            enabled: ['disable']
-        };
+    static chatListFromChannelNames(channels, user) {
+        /** @type {Object<String, Chat>} */
+        const knownChats = user.chatEngine.chats;
+        let chats = [];
 
-        return changeDirections[currentStates[currentStates.length - 1]].includes(targetState);
+        channels.forEach((channelName) => {
+            if (knownChats[channelName]) {
+                chats.push(knownChats[channelName]);
+            }
+        });
+
+        return chats;
     }
 }

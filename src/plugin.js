@@ -1,6 +1,6 @@
 /* eslint class-methods-use-this:["error",{"exceptMethods":["applicationIconBadgeNumber"]}] */
 /**
- * @file Chat Engine plugin to work with notifications using ReactNative bridge to native API.
+ * @file {@link ChatEngine} plugin to work with notifications using ReactNative bridge to native API.
  * @author Serhii Mamontov <sergey@pubnub.com>
  */
 import CENInvitationNotificationCategory from './models/invitation-notification-category';
@@ -10,24 +10,22 @@ import CENotificationAction from './models/notification-action';
 import { CENotificationsExtension } from './components/extension';
 
 /**
- * Create and configure {@link ChatEngine} plugin to work with push notifications.
+ * Function which allow to create and configure {@link ChatEngine} plugin to work with push
+ * notifications.
  * After plugin installation new property will be added to {@link Me} named `notifications` which
  * has same interface as {@link CENotifications}.
- *
- * @return {function(configuration: CEConfiguration):Object} Reference on function which can be used
- *     to complete {@link ChatEngine} plugin configuration.
  *
  * @example <caption>Simple setup</caption>
  * import { plugin } from 'chat-engine-notifications';
  *
- * ChatEngine.proto('Me', plugin({
+ * ChatEngine.me.plugin(plugin({
  *     events: ['$.invite', 'message'],
  *     platforms: { ios: true, android: true }
  * }));
  * @example <caption>Setup with notification formatter</caption>
  * import { plugin } from 'chat-engine-notifications';
  *
- * ChatEngine.proto('Me', plugin({
+ * ChatEngine.me.plugin(plugin({
  *     events: ['$.invite', 'message'],
  *     platforms: { ios: true, android: true },
  *     formatter: (payload) => {
@@ -43,12 +41,16 @@ import { CENotificationsExtension } from './components/extension';
   *            };
  *         } else if (payload.event === '$.invite') {
  *             // Use one of default formatter (there is for '$.invite' and 'message' events).
- *             return nil;
+ *             return null;
  *         }
  *         // Send as regular message without notification.
  *         return {};
  *     }
  * }));
+ *
+ * @param {CEConfiguration} configuration - Plugin configuration object.
+ *
+ * @return {Object} Configured push notification plugin object.
  */
 const plugin = configuration => ({
     namespace: 'chatEngineNotifications.me',
