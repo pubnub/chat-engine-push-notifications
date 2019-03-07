@@ -2,7 +2,7 @@
   "name": "chat-engine-notifications",
   "description": "ChatEngine Push Notifications support plugin",
   "homepage": "https://github.com/pubnub/chat-engine-push-notifications#readme",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "license": "MIT",
   "author": {
     "name": "Serhii Mamontov <sergey@pubnub.com>"
@@ -38,7 +38,7 @@
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsx-a11y": "^6.2.0",
     "eslint-plugin-react": "^7.12.4",
-    "gulp": "3.x.x",
+    "gulp": "^4.0.0",
     "gulp-eslint": "^5.0.0",
     "gulp-shell": "^0.6.5",
     "jest": "^24.0.0",

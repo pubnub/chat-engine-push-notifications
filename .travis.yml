@@ -5,6 +5,8 @@ node_js:
   - '9'
 cache: yarn
 install:
+  - npm uninstall -g gulp
+  - npm install -g gulp
   - npm install
   - npm install --no-save chat-engine react-native react acorn
 script:

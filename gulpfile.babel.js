@@ -8,6 +8,6 @@ gulp.task('full_test', shell.task('npm run test'));
 
 gulp.task('lint_code', () => gulp.src(['src/**/*.js']).pipe(eslint()).pipe(eslint.format()).pipe(eslint.failAfterError()));
 gulp.task('lint_tests', () => gulp.src(['test/**/*.js']).pipe(eslint()).pipe(eslint.format()).pipe(eslint.failAfterError()));
-gulp.task('validate', ['lint_code', 'lint_tests']);
+gulp.task('validate', gulp.series('lint_code', 'lint_tests'));
 
-gulp.task('test', ['validate', 'full_test']);
+gulp.task('test', gulp.series('validate', 'full_test'));
