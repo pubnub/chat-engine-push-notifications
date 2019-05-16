@@ -1,3 +1,7 @@
+This repository is a part of the [ChatEngine Framework](https://github.com/pubnub/chat-engine).
+For more information on building chat applications with PubNub, see our
+[Chat Resource Center](http://www.pubnub.com/developers/chat-resource-center/).
+
 # React Native Push Notification Plugin for ChatEngine
 
 Adds ability to provide remote notification payload for events sent by user to 
@@ -545,4 +549,4 @@ notifications from device's notifications center.
 
 ## Support
 
-- If you **need help**, have a **general question** a **feature request** or to file a **bug**, contact <support@pubnub.com>
+- If you **need help**, have a **general question**, have a **feature request** or to file a **bug**, contact <support@pubnub.com>.
