@@ -1,11 +1,11 @@
-Few object types is used within plugin and their structure will be explained here.
+Few object types are used within the plugin and their structure will be explained here.
 
 ### Notification permissions
-Object represent list of notification features which application would like to use.  
+An object represents a list of notification features which application would like to use.  
 
 | Field   | Type    | Attributes | Description |
 |:-------:|:-------:|:----------:|:----------- |
-| `alert` | Boolean | `Required` | Whether it should be allowed to present notifications on device (as bar or alert view). |  
+| `alert` | Boolean | `Required` | Whether it should be allowed to present notifications on the device (as a bar or alert view). |  
 | `badge` | Boolean | `Required` | Whether it should be allowed to change application badge number with push notification payload or not. |  
 | `sound` | Boolean | `Required` | Whether it should be allowed to play sound on notification receive or not. |  
 
@@ -29,13 +29,13 @@ Object represent received notification (which has been received by device).
 | Field             | Type    | Attributes | Description |
 |:-----------------:|:-------:|:----------:|:----------- |
 | `notification`    | Object  | `Required` | Object contain original notification payload (which has been appended when _event_ has been published). |  
-| `foreground`      | Boolean | `Required` | Whether notification has been received while application was in foreground or not. |
-| `userInteraction` | Boolean | `Required` | Whether notification has been delivered in response on user action with interactive notification or used it to launch application. |
+| `foreground`      | Boolean | `Required` | Whether notification has been received while the application was in the foreground or not. |
+| `userInteraction` | Boolean | `Required` | Whether notification has been delivered in response on user action with interactive notification or used it to launch the application. |
 | `action`          | [Action](#interactive-notification-action) | `YES` | In case if user picked action from interactive notification, it's information will be available in this property. |
 
 
 ### Delivered notification payload
-Object represent notification which has been delivered and not disposed from notification center.  
+An object represents notification which has been delivered and not disposed of notification center.  
 
 | Field  | Type | Attributes | Description |
 |:------:|:----:|:----------:|:----------- |
@@ -44,8 +44,7 @@ Object represent notification which has been delivered and not disposed from not
 
 
 ### Interactive notification action
-Object represent user picked action and may contain additional data (from input or provided during 
-category registration).  
+Object represent user picked an action and may contain additional data (from input or provided during category registration).  
 
 | Field        | Type   | Attributes | Description |
 |:------------:|:------:|:----------:|:----------- |

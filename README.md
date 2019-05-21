@@ -4,12 +4,11 @@ For more information on building chat applications with PubNub, see our
 
 # React Native Push Notification Plugin for ChatEngine
 
-Adds ability to provide remote notification payload for events sent by user to 
+Adds the ability to provide remote notification payload for events sent by the user to 
 [Chat](https://github.com/pubnub/chat-engine/blob/master/src/components/chat.js) and manage notifications in 
 notifications center.  
-[React Native](https://facebook.github.io/react-native/) used by plugin to register device for 
-remote notifications (receive token) and manage remote notifications list in notifications centers 
-(mostly to mark notification as `seen`).  
+[React Native](https://facebook.github.io/react-native/) used by the plugin to register a device for remote notifications (receive token) and manage remote notifications list in notifications centers 
+(mostly to mark the notification as `seen`).  
 
 ### Documentation
 
@@ -18,46 +17,41 @@ Documentation can be found [here](docs).
 ### Pre-requirements 
 
 1. PubNub Function with ChatEngine code.  
-   ChatEngine use PubNub Function as backend and it's configuration can be completed if you follow 
-   [this](https://chatengine-quickstart-app.pubnub.com/login) url and login with PubNub account 
+   ChatEngine use PubNub Function as backend and its configuration can be completed if you follow 
+   [this](https://chatengine-quickstart-app.pubnub.com/login) URL and login with PubNub account 
    credentials.    
-   This page is automated ChatEngine application configurator. After it will complete, you should use
-   keys from newly created ChatEngine application (in PubNub [Admin Console](https://admin.pubnub.com)).
+   This page is automated ChatEngine application configurator. After it will complete, you should use keys from newly created ChatEngine application (in PubNub [Admin Console](https://admin.pubnub.com)).
 2. Complete required steps from [this](https://gist.github.com/parfeon/c2733f7257ab80909d19571d33ec9b9c) 
-   guide to prepare application for **iOS** application to use _Push Notifications_.  
+   guide to prepare the application for **iOS** application to use _Push Notifications_.  
    For `seen` functionality we also need to enable one of _Background Modes_ from `Capabilities` tab:
    ![Enable background mode](https://user-images.githubusercontent.com/794617/53302598-70b25380-3868-11e9-8ab3-78a0ff870aae.png)
 3. Complete required steps from [this](https://gist.github.com/parfeon/c438d5175adff86b8a0830a8a96d0301) 
-   guide to prepare application for **Android** application to use _FCM_ service.
+   guide to prepare the application for the **Android** application to use _FCM_ service.
 
 ### Integration
 
-In this document we will use codebase created by `react-native-cli`.  
-[React Native](https://facebook.github.io/react-native/) toolchain is depends from OS and platform 
-for this application should be generated. Please see read 
+In this document, we will use codebase created by `react-native-cli`.  
+[React Native](https://facebook.github.io/react-native/) toolchain is depended from OS and platform for this application should be generated. Please see read 
 [this ReactNative Getting Started](https://facebook.github.io/react-native/docs/getting-started) 
 page under **Building Projects with Native Code** - this is required, because plugin use callbacks 
 from iOS / Android to notify [React Native](https://facebook.github.io/react-native/) JS code about those 
 events.  
 
-Following command has been used to create application which will be used to demonstrate integration 
+Following command has been used to create an application which will be used to demonstrate the integration 
 steps:  
 ```text
 react-native init ChatEnginePushIntegration
 cd ChatEnginePushIntegration
 ``` 
 
-After we created demo application, we need to install required dependencies from 
-[yarn](https://yarnpkg.com) by running following command:  
+After we created a demo application, we need to install required dependencies from 
+[yarn](https://yarnpkg.com) by running the following command:  
 ```text
 yarn add chat-engine chat-engine-notifications 
 ```  
 
-Demo application will require from user tap on `Connect` button on all tested devices and on some 
-devices send application to background, so notifications will appear on screen. There is two buttons
-after `Connect` which allow to send different event types.  
-At the end, there is two buttons, which allow to hide last received messages (one-by-on) or hide all
-notifications from device's notifications center.  
+The demo application will require from user tap on `Connect` button on all tested devices and on some devices send an application to the background so notifications will appear on the screen. There are two buttons after `Connect` which allow sending different event types.  
+In the end, there are two buttons, which allow to hide last received messages (one-by-one) or hide all notifications from the device's notifications center.  
 
 
 #### React Native
@@ -72,7 +66,7 @@ notifications from device's notifications center.
    import { TouchableHighlight, Platform, StyleSheet, Alert, Text, View } from 'react-native';
    ```
 3. Update default application layout in `App.js` by replacing oof default App component and styles 
-   with following code:
+   with the following code:
    ```javascript
    export default class App extends Component {
      constructor(properties) {
@@ -124,7 +118,7 @@ notifications from device's notifications center.
      }
   
      onChatEngineReady() {
-       // Register plugin and subscribe on events from plugin explained in next paragraph.
+       // Register plugin and subscribe on events from plugin explained in the next paragraph.
      }
    
      onPressConnect () {
@@ -265,10 +259,10 @@ notifications from device's notifications center.
    
    * use own remote notifications payload for `like` event where notification title will include 
      sender's `uuid` and name of chat on which event has been received (extracted from `chat.channel`) 
-   * don't send any notifications when inviting remote user (`$.invite`) by returning empty object 
+   * don't send any notifications when inviting remote user (`$.invite`) by returning an empty object 
      w/o `apns` and `gcm` keys. 
    * use bundled formatter for `message` event by simply returning `null` from `formatter` function.
-6. Subscribe on events which is sent by plugin by adding following code at the end of
+6. Subscribe on events which are sent by plugin by adding the following code at the end of
    `onChatEngineReady()` function body:  
    ```javascript
    ChatEngine.me.notifications.on('$notifications.registered', (token) => {   
@@ -339,7 +333,7 @@ notifications from device's notifications center.
    
 #### iOS
 
-1. [CocoaPods](https://cocoapods.org) required for integration completion. Tool can be installed by 
+1. [CocoaPods](https://cocoapods.org) required for integration completion. The tool can be installed by 
    running following command:
    ```text
    sudo gem install cocoapods
@@ -362,14 +356,13 @@ notifications from device's notifications center.
    ```text
    pod install
    ```
-3. After commandline tool will complete, make sure to remove certain folders, because of possible
-   conflict between ReactNative packager files and files which has ben copied with CocoaPods:
+3. After commandline tool will complete, make sure to remove certain folders, because of the possible conflict between ReactNative packager files and files which has ben copied with CocoaPods:
    ```text
    rm ios/Pods/React/package.json
    rm -R ios/Pods/React/node_modules
    ```
    **Note:** This clean up will be required each time when you call `pod install`.
-3. When commandline tool will complete installation process, you should be able to find 
+3. When the commandline tool will complete the installation process, you should be able to find 
    `ChatEnginePushIntegration.xcworkspace` and open it.
 4. If iOS application is expected to run only on iOS 10+, then we can import another API to work 
    with push notifications.  
@@ -470,7 +463,7 @@ notifications from device's notifications center.
 #### Android
 
 1. Open Android project from `android` directory with Android studio.
-2. Use combination `Shift+Cmd+O` from opened Android Studio where type or paste `build.gradle` and 
+2. Use combination `Shift+Cmd+O` from opened Android Studio where the type or paste `build.gradle` and 
    pick from suggested `build.gradle (app)`. Find `applicationId` field in it and replace value with
    application identifier which has been assigned to application which you registered by following 
    [this](https://gist.github.com/parfeon/c438d5175adff86b8a0830a8a96d0301#file-1-configure-fcm-md) 
@@ -489,7 +482,7 @@ notifications from device's notifications center.
    ``` 
 7. From project tree root select `ChatEnginePushIntegration` and use combination `Cmd+↓` to open 
    module settings.
-8. From opened interface pick `app` from `Modules` in sidebar and open `Dependencies` tab on the 
+8. From opened interface pick `app` from `Modules` in the sidebar and open `Dependencies` tab on the 
    right.
 9. Click `+` at the bottom to add new module dependency.
    ![Add module dependency](https://user-images.githubusercontent.com/794617/53347657-3b6a3c00-3922-11e9-8507-12e1558e6de8.png)
