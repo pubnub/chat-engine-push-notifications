@@ -1,6 +1,5 @@
-If custom formatter provided, it is possible to customize how notification will be presented to the 
-user on iOS and/or Android device.  
-Payload which returned from formatter should contain keys (for required platforms): `apns` and / or `gcm`.  
+If custom formatter provided, it is possible to customize how the notification will be presented to the user on iOS and/or Android device.  
+Payload which returned from formatter should contain keys (for required platforms): `apns` and/or `gcm`.  
 Each platform has own requirements for notification payload content.  
 
 **NOTE:** Notification payload will contain additional object for each platform from 
@@ -13,14 +12,13 @@ root and `gcm.data` objects.
   * type: `String` or `Object`
   * required: **true**  
 
-  When specified as string, it should be UTF-8 string and it will be presented in notification body.  
-  Configuration as object allow to specify and localize notification layout using next keys:  
+  When specified as a string, it should be UTF-8 string and it will be presented in notification body.  
+  Configuration as object allows to specify and localize notification layout using the next keys:  
     * `title`
       * type: `String`
       * required: **true**  
 
-      It should be quick explanation of reason why this notification has been sent. Shown in bold 
-      above notification `body` message.  
+      It should be a quick explanation of the reason why this notification has been sent. Shown in bold above notification `body` message.  
     * `body`
       * type: `String`
       * required: **true**  
@@ -30,8 +28,7 @@ root and `gcm.data` objects.
       * type: `String`
       * required: **false**  
       
-      Notification title localization key. This key allow to use `Localizable.strings` file to 
-      localize notification title to one of supported languages.  
+      Notification title localization key. This key allows using `Localizable.strings` file to localize notification title to one of the supported languages.  
     * `title-loc-args`  
       * type: `String[]`  
       * required: **false**  
@@ -43,59 +40,53 @@ root and `gcm.data` objects.
       * type: `String`  
       * required: **false**  
       
-      Notification view action localization key. This key allow to use `Localizable.strings` file to 
-      localize notification _View_ button with one of supported languages.  
+      Notification view action localization key. This key allows using `Localizable.strings` file to localize notification _View_ button with one of the supported languages.  
     * `loc-key`  
       * type: `String`  
       * required: **false**  
       
-      Notification message localization key. This key allow to use `Localizable.strings` file to 
-      localize notification message to one of supported languages.  
+      Notification message localization key. This key allows using `Localizable.strings` file to localize notification message to one of the supported languages.  
     * `loc-args`  
       * type: `String[]`  
       * required: **false**  
       
-      This list of strings used in case if value in `Localizable.strings` which correspond to 
-      `loc-key` is format string and `loc-args` is used to substitute placeholders in localized 
+      This list of strings used in case if the value in `Localizable.strings` which correspond to 
+      `loc-key` is format string and `loc-args` is used to substitute placeholders in the localized 
       format string.  
     * `launch-image`
       * type: `String`  
       * required: **false**  
       
-      Name of image file which should be shown during application launch after user tap on 
-      notification.  
+      Name of image file which should be shown during application launch after user tap on the notification.  
 * `badge`  
   * type: `Number`
   * required: **false**
   
-  Value which should be shown on application's icon badge when notification will be received by 
-  user's device.  
+  The value which should be shown on the application's icon badge when notification will be received by the user's device.  
 * `sound`
   * type: `String`  
   * required: **false**  
   
-  Name of audio file which should be played when notification will be received.  
+  Name of the audio file which should be played when notification will be received.  
 * `category`  
   * type: `String`  
   * required: **false**  
   
-  Unique name for notification handling category which can be used by system to provide actions for 
-  user. Categories registered along with requested permissions with 
+  Unique name for notification handling category which can be used by the system to provide actions for the user. Categories registered along with requested permissions with 
   [this](../api#request-permissions-to-use-push-notifications) API.  
   
 For more information about notification payload for Apple's push notification service please read 
 [this](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CreatingtheNotificationPayload.html) documentation.  
 
 #### `gcm` payload keys
-It is better to use `data` notifications, because this is the only way properly configure 
-notification which should be shown to the user.  
+It is better to use `data` notifications because this is the only way properly configure notification which should be shown to the user.  
 Next is the list of keys which can be stored in `gcm.data` object:  
 
 * `contentTitle`
   * type: `String`
   * required: **true**  
 
-  It should be quick explanation of reason why this notification has been sent. Shown in bold above 
+  It should be a quick explanation of the reason why this notification has been sent. Shown in bold above 
   notification `contentText ` message.  
 * `contentText`
   * type: `String`
@@ -106,22 +97,21 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `Number`
   * required: **false**
   
-  Value which should be shown on application's icon badge when notification will be received by 
-  user's device.  
+  The value which should be shown on the application's icon badge when notification will be received by the user's device.  
 * `autoCancel`  
   * type: `Boolean`
   * required: **false**  
   * default: `true`
   
-  Whether notification should automatically disappear from notification center or not.
+  Whether notification should automatically disappear from the notification center or not.
 * `click_action`  
   * type: `String`
   * required: **false**
   * default: `launcher activity class name`  
   
-  Name of activity, which should be presented after user tap on notification. Name should be 
-  composed relatively to package name (`com.company.app`): `<path-to-class>.<activity-class-name>`.  
-  If default or custom activities is used for navigation from notification, next code should be 
+  Name of activity, which should be presented after the user tap on the notification. The name should be 
+  composed relatively to the package name (`com.company.app`): `<path-to-class>.<activity-class-name>`.  
+  If default or custom activities is used for navigation from notification, the next code should be 
   added to them to forward user action back to this plugin:  
   ```java
   @Override
@@ -133,8 +123,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `String[]`  
   * required: **false**  
   
-  Reference on list of actions which should be suggested to user when notification body will be 
-  expanded. Passed actions should be registered before can be used with interactive notifications 
+  Reference on a list of actions which should be suggested to the user when notification body will be expanded. Passed actions should be registered before can be used with interactive notifications 
   using [this](../api#register-notification-actions) API.  
 * `defaults`  
   * type: `Number[]`  
@@ -153,7 +142,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * required: **false**  
   * default: `ic_launcher`  
   
-  Name of icon which should be used to show in notification's content view.  
+  Name of the icon which should be used to show in notification's content view.  
 * `lights`  
   * type: `Number[]`  
   * required: **false**  
@@ -165,8 +154,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `Number`  
   * required: **false**  
   
-  How many events represented by this notification. This value will be shown in notification center 
-  and added to application's icon badge.  
+  How many events represented by this notification. This value will be shown in the notification center and added to the application's icon badge.  
 * `ongoing`  
   * type: `Boolean`  
   * required: **false**  
@@ -208,23 +196,22 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * required: **false**  
   * default: `ic_notification` or `ic_launcher`  
   
-  Name of icon which should be shown on the top left corner of notification and in status bar.  
+  Name of the icon which should be shown on the top left corner of notification and in the status bar.  
 * `sound`  
   * type: `String`
   * required: **false**  
   
-  Name of audio file which should be played when notification received.  
+  Name of the audio file which should be played when notification received.  
 * `subText`  
   * type: `String`
   * required: **false**  
 
-  Text which is shown in notification header and may contain information like: name of chat from 
-  which notification has been received or name of user which sent message.  
+  A text which is shown in notification header and may contain information like name of chat from which notification has been received or name of the user which sent a message.  
 * `ticker`
   * type: `String`  
   * required: **false**  
   
-  Message which is shown right in status bar upon notification receive.  
+  A message which is shown right in the status bar upon notification receive.  
 * `usesChronometer`  
   * type: `Boolean`  
   * required: **false**  
@@ -236,13 +223,13 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * required: **false**  
   * default: `[1000]`
 
-  Sequence of timings for vibration and silence periods. This option can be used if `defaults` 
+  A sequence of timings for vibration and silence periods. This option can be used if `defaults` 
   contain _defaultVibrate_ option in it.  
 * `when`  
   * type: `Number`
   * required: **false**  
   
-  Time when scheduled event is expected to happen.  
+  A time when the scheduled event is expected to happen.  
 * `sortKey`  
   * type: `String`  
   * required: **false**  
@@ -252,8 +239,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `String`  
   * required: **false**  
  
-  Key which allow to group similar notification (with same _group_) into clusters and present them 
-  in groups in notification center.  
+  A key which allows to group similar notification (with the same _group_) into clusters and presents them in groups in the notification center.  
 * `groupSummary`  
   * type: `Boolean`  
   * required: **false**  
@@ -264,7 +250,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * required: **false**  
 
   Person identifier to which this notification related and depending from specified `category` 
-  system may preprocess it and handle user tap according to `category`.  
+  the system may preprocess it and handle user tap according to `category`.  
 * `color`  
   * type: `Number` 
   * required: **false** 
@@ -320,7 +306,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `String`
   * required: **false**  
   
-  Unique identifier of notification channel which should be used to present notification to user.  
+  Unique identifier of notification channel which should be used to present a notification to the user.  
 * `colorized`
   * type: `Boolean`
   * required: **false**  
@@ -340,7 +326,7 @@ Next is the list of keys which can be stored in `gcm.data` object:
   * type: `String`
   * required: **false**
   
-  Text that will appear as a link to your application's settings.  
+ A Text that will appear as a link to your application's settings.  
 
 Please refer to [this](https://developer.android.com/reference/android/app/Notification.Builder.html) 
 documentation to get more information about notification payload configuration (most fields 
