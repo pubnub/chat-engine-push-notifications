@@ -3,8 +3,7 @@ Plug-in emit four events: `$notifications.registered`, `$notifications.registrat
 about new notification and when notification has been marked as `seen`.
 
 ### Handling new notifications
-New remote notifications can be received from native application in few cases: application was in 
-foreground or application has been launched because of user interaction with notification 
+New remote notifications can be received from native application in few cases: the application was in foreground or application has been launched because of user interaction with the notification 
 (interactive notification).  
 To handle these events, event subscriber can be added to `notifications` property of 
 [Me](https://github.com/pubnub/chat-engine/blob/master/src/components/me.js) to listen for 
@@ -18,9 +17,7 @@ ChatEngine.me.notifications.on('$notifications.received', notification =>
 ```
 
 ### Handling notification 'seen'
-When local user mark notification as `seen` - this event sent across all devices which he used to 
-work in chat and notification will disappear from notification centers on those devices. This event 
-can be useful to update list of unchecked notifications in application.  
+When local user mark notification as `seen` - this event sent across all devices which he used to work in chat and notification will disappear from notification centers on those devices. This event can be useful to update the list of unchecked notifications in application.  
 To handle these events, event subscriber can be added to `notifications` property of 
 [Me](https://github.com/pubnub/chat-engine/blob/master/src/components/me.js) to listen for 
 `$notifications.seen` event.  

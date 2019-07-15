@@ -14,7 +14,7 @@ ChatEngine.me.plugin(plugin({
 }));
 
 ```
-This is all what required to perform minimal configuration.
+This is all that required to perform minimal configuration.
 
 
 ### Properties:

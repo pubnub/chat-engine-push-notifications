@@ -1,6 +1,5 @@
-Interactive notification actions allow to describe how notification should be treated after user 
-interaction and whether application should be shown.  
-This object useful only with iOS environment and there will be no effect from it in Android 
+Interactive notification actions allow describing how the notification should be treated after user interaction and whether the application should be shown.  
+This object useful only with the iOS environment and there will be no effect from it in an Android 
 environment because it will be ignored during permissions request.  
 
 ```js

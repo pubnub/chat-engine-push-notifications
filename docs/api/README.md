@@ -1,4 +1,4 @@
-Plug-in provide set of functions to work with notifications.  
+Plug-in provides a set of functions to work with notifications.  
 After registration with [ChatEngine](https://github.com/pubnub/chat-engine), new property appear 
 for [Me](https://github.com/pubnub/chat-engine/blob/master/src/components/me.js) and called 
 `notifications` - this is entry point for calling API and handling events.  
@@ -35,7 +35,7 @@ from PubNub [Admin Console](https://admin.pubnub.com).
 This function allow to request this information from native application and get **asynchronous** 
 response through passed _callback_ function.  
 
-**Note:** for Android it will return immediately with **-1** as result.  
+**Note:** for Android it will return immediately with **-1** as a result.  
  
 ### Parameters:
 
@@ -65,7 +65,7 @@ This function allow to change currently displayed application's icon badge numbe
 
 | Parameter | Type   | Attributes | Description |
 |:---------:|:------:|:----------:| ----------- |
-| `number`  | Number | `Required` | Value which should be shown on application's icon badge. |  
+| `number`  | Number | `Required` | Value which should be shown on the application's icon badge. |  
 
 ### Example
 
@@ -76,10 +76,8 @@ ChatEngine.me.notifications.setApplicationIconBadgeNumber(3);
 <br/><a id="requestpermissions" />
 
 [`requestPermissions(permissions, categories)`](#requestpermissions)
-This function allow to request permissions from native application to register device to receive 
-remote notifications.  
-**iOS** environment additionally allow to configure which _permissions_ for notifications should be 
-requested and allow to specify notification handling _category_.  
+This function allows requesting permissions from a native application to register a device to receive remote notifications.  
+**iOS** environment additionally allows configuring which _permissions_ for notifications should be requested and allow to specify notification handling _category_.  
 Function return _Promise_ which if required to update interface can be handled.    
 
 **Note:** for Android it will return immediately with resolved _Promise_ because there is no need to
@@ -105,9 +103,7 @@ ChatEngine.me.notifications.requestPermissions({alert: true, badge: false, sound
 <br/><a id="registernotificationchannel" />
 
 [`registerNotificationChannels(channels)`](#registernotificationchannel)
-Starting from Android Oreo (8.0) it is required to register notification channel which will be used 
-to route notification. Channel contain basic information about how notifications will be presented 
-when sent to it.  
+Starting from Android Oreo (8.0) it is required to register notification channel which will be used to route notification. Channel contains basic information about how notifications will be presented when sent to it.  
 
 **Note:** for iOS this function will return immediately.  
 
@@ -129,8 +125,7 @@ ChatEngine.me.notifications.registerNotificationChannels([
 <br/><a id="registernotificationactions" />
 
 [`registerNotificationActions(actions)`](#registernotificationactions)
-It is possible to register listeners for actions which user pick from interactive notification. This
-function allow to bind action to open specified .  
+It is possible to register listeners for actions which user pick from the interactive notification. This function allows binding an action to open specified.  
 
 **Note:** for iOS this function will return immediately.
 
@@ -150,7 +145,7 @@ ChatEngine.me.notifications.registerNotificationActions({ Accept: 'JoinScreen', 
 <br/><a id="deliverinitialnotifications" />
 
 [`deliverInitialNotification()`](#deliverinitialnotifications)
-This function allow to receive notification which has been used to open application.  
+This function allows receiving a notification which has been used to open application.  
 Notification will be sent along with `$notifications.received` event.
 
 ### Example
